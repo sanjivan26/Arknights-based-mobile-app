@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import './../colorfab.dart';
+import 'classmapping.dart';
 
 class OperatorInfo extends StatefulWidget {
   final dynamic operator;
@@ -104,6 +105,7 @@ class _OperatorInfoState extends State<OperatorInfo> {
                   constraints: BoxConstraints(minHeight: 40, maxHeight: 90),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Expanded(
                         child: Text(
@@ -116,7 +118,6 @@ class _OperatorInfoState extends State<OperatorInfo> {
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      const SizedBox(height: 2),
                       Row(
                         children: List.generate(
                           rarity,
@@ -129,7 +130,7 @@ class _OperatorInfoState extends State<OperatorInfo> {
                       ),
                       const SizedBox(height: 3),
                       Text(
-                        widget.operator['profession'] ?? '',
+                        classMapping[widget.operator['profession']] ?? '',
                         style: TextStyle(fontSize: 15, color: ColorFab.darkAccent),
                       ),
                       Text(
