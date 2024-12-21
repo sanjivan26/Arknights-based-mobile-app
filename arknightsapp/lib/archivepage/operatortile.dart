@@ -1,3 +1,4 @@
+import './../colorfab.dart';
 import 'package:flutter/material.dart';
 
 class OperatorTile extends StatefulWidget {
@@ -20,7 +21,7 @@ class _OperatorTileState extends State<OperatorTile> {
     return Container(
       padding: const EdgeInsets.all(3.0),
       decoration: BoxDecoration(
-        color: Colors.grey,
+        color: ColorFab.darkGrey,
         borderRadius: BorderRadius.circular(5),
       ),
       child: Column(
@@ -58,3 +59,4 @@ class _OperatorTileState extends State<OperatorTile> {
     );
   }
 }
+

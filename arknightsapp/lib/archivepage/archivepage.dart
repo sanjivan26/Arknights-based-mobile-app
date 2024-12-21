@@ -1,7 +1,8 @@
 import 'dart:convert';
+import '../colorfab.dart';
+import 'package:http/http.dart' as http;
 import './operatortile.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show rootBundle;
 
 class ArchivePage extends StatefulWidget {
   const ArchivePage({super.key});
@@ -16,13 +17,18 @@ class _ArchivePageState extends State<ArchivePage> {
   @override
   void initState() {
     super.initState();
-    _operatorsFuture = loadOperators();
+    _operatorsFuture = fetchOperators();
   }
 
-  Future<Map<String, dynamic>> loadOperators() async {
-    final String jsonString = await rootBundle
-        .loadString('assets/database/character_table_main.json');
-    return json.decode(jsonString);
+  Future<Map<String, dynamic>> fetchOperators() async {
+    final url = Uri.parse('https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/en_US/gamedata/excel/character_table.json'); // Replace with your API URL
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body) as Map<String, dynamic>;
+    } else {
+      throw Exception('Failed to load operators');
+    }
   }
 
   @override
@@ -46,7 +52,7 @@ class _ArchivePageState extends State<ArchivePage> {
               .toList();
 
           return Container(
-            color: Colors.black,
+            color: ColorFab.lightBlack,
             padding: const EdgeInsets.all(3.0),
             child: GridView.builder(
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
