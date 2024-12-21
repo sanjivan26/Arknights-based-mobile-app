@@ -24,7 +24,6 @@ class _OperatorTileState extends State<OperatorTile> {
 
     return InkWell(
       onTap: () {
-        // Navigate to OperatorDetails and pass the operator data
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -33,9 +32,9 @@ class _OperatorTileState extends State<OperatorTile> {
         );
       },
       child: Container(
-        padding: const EdgeInsets.all(3.0),
+        padding: const EdgeInsets.all(5.0),
         decoration: BoxDecoration(
-          color: ColorFab.darkGrey,
+          color: ColorFab.lightShadow,
           borderRadius: BorderRadius.circular(5),
         ),
         child: Column(
@@ -47,7 +46,7 @@ class _OperatorTileState extends State<OperatorTile> {
               height: imageSize,
               decoration: BoxDecoration(
                 border: Border.all(
-                  color: ColorFab.lightGrey,
+                  color: ColorFab.darkAccent,
                   width: 2,
                 ),
                 borderRadius: BorderRadius.circular(15),
@@ -60,10 +59,11 @@ class _OperatorTileState extends State<OperatorTile> {
                 ),
               ),
             ),
+            SizedBox(height: 4),
             Flexible(
               child: Text(
                 operator['name'] ?? 'Unknown Operator',
-                style: const TextStyle(color: Colors.white),
+                style: const TextStyle(color: ColorFab.darkAccent),
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
               ),
