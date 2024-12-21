@@ -8,5 +8,7 @@ class ColorFab {
   static const Color offWhite = Color(0xFFF2F3F4);
   static const Color offBlack = Color(0xFF181818);
   static const Color lightShadow = Color(0xFFD3D3D3);
+  static const Color darkShadow = Color(0xFFACACAC);
   static const Color darkAccent = Color(0xFF555555);
+  static const Color midAccent = Color(0xFF6B6B6B);
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import './../colorfab.dart';
 
 class Trait extends StatelessWidget {
   final Map<String, dynamic> operator;
@@ -18,15 +19,15 @@ class Trait extends StatelessWidget {
           Text(
             'Trait',
             style: TextStyle(
-              fontSize: 15,
-              color: Colors.grey,
+              fontSize: 18,
+              color: ColorFab.midAccent,
             ),
           ),
           Text(
             description,
             style: TextStyle(
               fontSize: 15,
-              color: Colors.grey.shade600,
+              color: ColorFab.darkAccent,
             ),
           ),
         ],

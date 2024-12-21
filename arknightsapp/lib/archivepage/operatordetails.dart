@@ -1,4 +1,4 @@
-import 'package:arknightsapp/colorfab.dart';
+import './../colorfab.dart';
 import 'package:flutter/material.dart';
 import './operatorinfo.dart';
 import './trait.dart';
@@ -22,15 +22,19 @@ class OperatorDetails extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           title: Text(operator['name'] ?? 'Operator Details'),
+          backgroundColor: ColorFab.offWhite,
         ),
-        body: Column(
-          children: [
-            OperatorInfo(operator: operator),
-            Divider(),
-            Trait(operator: operator),
-            Divider(),
-            Skills(operator: operator,)
-          ],
+        body: Container(
+          color: ColorFab.offWhite,
+          child: Column(
+            children: [
+              OperatorInfo(operator: operator),
+              Divider(),
+              Trait(operator: operator),
+              Divider(),
+              Skills(operator: operator,)
+            ],
+          ),
         ),
       ),
     );

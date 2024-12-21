@@ -63,7 +63,7 @@ class _OperatorTileState extends State<OperatorTile> {
             Flexible(
               child: Text(
                 operator['name'] ?? 'Unknown Operator',
-                style: const TextStyle(color: ColorFab.darkAccent),
+                style: const TextStyle(color: ColorFab.offBlack),
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
               ),

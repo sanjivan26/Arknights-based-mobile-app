@@ -1,6 +1,7 @@
 import './archivepage/archivepage.dart';
 import './homepage/homepage.dart';
 import 'package:flutter/material.dart';
+import './colorfab.dart';
 
 void main() {
   runApp(const App());
@@ -25,28 +26,29 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  int _selectedIndex = 0;  // Tracks the selected index in the BottomNavigationBar
+  int _selectedIndex = 0;  
 
-  // List of pages corresponding to the navigation items
   final List<Widget> _pages = [
-    const HomeScreen(),  // Home screen widget
-    const ArchivePage(),  // Archive screen widget
+    const HomeScreen(), 
+    const ArchivePage(),  
   ];
 
-  // Function to handle tab selection
   void _onItemTapped(int index) {
     setState(() {
-      _selectedIndex = index;  // Update the selected index when a tab is tapped
+      _selectedIndex = index; 
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _pages[_selectedIndex],  // Display the widget based on the selected index
+      body: _pages[_selectedIndex],  
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,  // Current selected tab
-        onTap: _onItemTapped,  // Set the callback to handle tab switch
+        backgroundColor: ColorFab.offWhite,
+        selectedItemColor: ColorFab.offBlack, 
+        unselectedItemColor: ColorFab.grey,       
+        currentIndex: _selectedIndex,  
+        onTap: _onItemTapped,  
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
