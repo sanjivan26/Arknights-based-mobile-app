@@ -33,7 +33,7 @@ class _OperatorTileState extends State<OperatorTile> {
             height: imageSize,
             decoration: BoxDecoration(
               border: Border.all(
-                color: Colors.white,
+                color: ColorFab.lightGrey,
                 width: 2,
               ),
               borderRadius: BorderRadius.circular(15),
