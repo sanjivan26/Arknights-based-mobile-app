@@ -100,7 +100,7 @@ class _OperatorInfoState extends State<OperatorInfo> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 15),
+                const SizedBox(width: 25),
                 Container(
                   constraints: BoxConstraints(minHeight: 40, maxHeight: 90),
                   child: Column(
