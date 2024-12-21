@@ -1,5 +1,7 @@
 import './../colorfab.dart';
 import 'package:flutter/material.dart';
+import './operatordetails.dart';
+import './imagemapping.dart';
 
 class OperatorTile extends StatefulWidget {
   final dynamic operator;
@@ -15,48 +17,60 @@ class _OperatorTileState extends State<OperatorTile> {
   Widget build(BuildContext context) {
     final operator = widget.operator;
 
+    String imagePath = imageMapping[operator['name']] ?? imageMapping['default']!;
+
     double screenWidth = MediaQuery.of(context).size.width;
     double imageSize = screenWidth * 0.20;
 
-    return Container(
-      padding: const EdgeInsets.all(3.0),
-      decoration: BoxDecoration(
-        color: ColorFab.darkGrey,
-        borderRadius: BorderRadius.circular(5),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min, 
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: imageSize,
-            height: imageSize,
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: ColorFab.lightGrey,
-                width: 2,
-              ),
-              borderRadius: BorderRadius.circular(15),
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(15),
-              child: Image.asset(
-                'assets/images/Amiya.jpg',
-                fit: BoxFit.cover,
-              ),
-            ),
+    return InkWell(
+      onTap: () {
+        // Navigate to OperatorDetails and pass the operator data
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => OperatorDetails(operator: operator),
           ),
-          Flexible(
-            child: Text(
-              operator['name'] ?? 'Unknown Operator',
-              style: const TextStyle(color: Colors.white),
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.all(3.0),
+        decoration: BoxDecoration(
+          color: ColorFab.darkGrey,
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: imageSize,
+              height: imageSize,
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: ColorFab.lightGrey,
+                  width: 2,
+                ),
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(15),
+                child: Image.asset(
+                  imagePath,  
+                  fit: BoxFit.cover,
+                ),
+              ),
             ),
-          ),
-        ],
+            Flexible(
+              child: Text(
+                operator['name'] ?? 'Unknown Operator',
+                style: const TextStyle(color: Colors.white),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
-
