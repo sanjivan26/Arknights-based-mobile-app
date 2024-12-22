@@ -4,7 +4,6 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import './operatortile.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
-import 'classmapping.dart';
 
 class ArchiveContent extends StatefulWidget {
   const ArchiveContent({super.key});
