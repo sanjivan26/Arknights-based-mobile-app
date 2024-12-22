@@ -21,7 +21,8 @@ class _ArchiveContentState extends State<ArchiveContent> {
   }
 
   Future<Map<String, dynamic>> fetchOperators() async {
-    final url = Uri.parse('https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/en_US/gamedata/excel/character_table.json');
+    final url = Uri.parse(
+        'https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/en_US/gamedata/excel/character_table.json');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
@@ -54,19 +55,39 @@ class _ArchiveContentState extends State<ArchiveContent> {
           return Container(
             color: ColorFab.offWhite,
             padding: const EdgeInsets.all(3.0),
-            child: GridView.builder(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 4,
-                crossAxisSpacing: 3,
-                mainAxisSpacing: 3,
-                childAspectRatio: 0.825,
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 5.0),
-              itemCount: filteredOperators.length,
-              itemBuilder: (context, index) {
-                final operator = filteredOperators[index].value;
-                return OperatorTile(operator);
-              },
+            child: Column(
+              children: [
+                Container(
+                  height: 50, 
+                  alignment: Alignment.centerLeft,
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Text(
+                    'Operator Archive',
+                    style: TextStyle(
+                      color: ColorFab.midAccent,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 5), 
+                Expanded(
+                  child: GridView.builder(
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 4,
+                      crossAxisSpacing: 3,
+                      mainAxisSpacing: 3,
+                      childAspectRatio: 0.825,
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                    itemCount: filteredOperators.length,
+                    itemBuilder: (context, index) {
+                      final operator = filteredOperators[index].value;
+                      return OperatorTile(operator);
+                    },
+                  ),
+                ),
+              ],
             ),
           );
         } else {

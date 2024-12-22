@@ -11,7 +11,7 @@ class Trait extends StatelessWidget {
         .replaceAll(RegExp(r'(to\s)?\{[A-Za-z_]+(:0%)?\}[\s]?'), '');
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,

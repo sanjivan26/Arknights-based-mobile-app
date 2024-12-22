@@ -1,5 +1,6 @@
 import './archivepage/archivepage.dart';
 import './homepage/homepage.dart';
+import './toolspge/toolspage.dart';
 import 'package:flutter/material.dart';
 import './colorfab.dart';
 
@@ -29,7 +30,8 @@ class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;  
 
   final List<Widget> _pages = [
-    const HomeScreen(), 
+    const HomeScreen(),                             
+    const ToolsPage(),
     const ArchivePage(),  
   ];
 
@@ -53,6 +55,10 @@ class _MainScreenState extends State<MainScreen> {
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: 'Tools',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.file_copy),
