@@ -31,44 +31,45 @@ class _OperatorTileState extends State<OperatorTile> {
           ),
         );
       },
-      child: Container(
-        padding: const EdgeInsets.all(5.0),
-        decoration: BoxDecoration(
-          color: ColorFab.lightShadow,
-          borderRadius: BorderRadius.circular(5),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              width: imageSize,
-              height: imageSize,
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: ColorFab.darkAccent,
-                  width: 2,
+      child: IntrinsicHeight(
+        child: Container(
+          padding: const EdgeInsets.all(3.0),
+          decoration: BoxDecoration(
+            color: ColorFab.lightShadow,
+            borderRadius: BorderRadius.circular(5),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: imageSize,
+                height: imageSize,
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: ColorFab.darkAccent,
+                    width: 2,
+                  ),
+                  borderRadius: BorderRadius.circular(15),
                 ),
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(15),
-                child: Image.asset(
-                  imagePath,  
-                  fit: BoxFit.cover,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(15),
+                  child: Image.asset(
+                    imagePath,  
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
-            ),
-            SizedBox(height: 4),
-            Flexible(
-              child: Text(
-                operator['name'] ?? 'Unknown Operator',
-                style: const TextStyle(color: ColorFab.offBlack),
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
+              Flexible(
+                child: Text(
+                  operator['name'] ?? 'Unknown Operator',
+                  style: const TextStyle(color: ColorFab.offBlack),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
