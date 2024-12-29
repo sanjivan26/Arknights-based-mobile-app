@@ -11,4 +11,5 @@ class ColorFab {
   static const Color darkShadow = Color(0xFFACACAC);
   static const Color darkAccent = Color(0xFF555555);
   static const Color midAccent = Color(0xFF6B6B6B);
+  static const Color redAccent = Color(0xFFFF9982);
 }

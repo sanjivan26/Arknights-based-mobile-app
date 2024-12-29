@@ -12,6 +12,22 @@ class ArchiveContent extends StatefulWidget {
   State<ArchiveContent> createState() => _ArchiveContentState();
 }
 
+class JsonCache {
+  static final Map<String, String> _cache = {};
+
+  static String? get(String key) {
+    return _cache[key];
+  }
+
+  static void set(String key, dynamic jsonData) {
+    _cache[key] = jsonEncode(jsonData);
+  }
+
+  static void clear() {
+    _cache.clear();
+  }
+}
+
 class _ArchiveContentState extends State<ArchiveContent> {
   late Future<Map<String, dynamic>> _operatorsFuture;
   List<dynamic> _filteredOperators = [];
@@ -26,12 +42,24 @@ class _ArchiveContentState extends State<ArchiveContent> {
   }
 
   Future<Map<String, dynamic>> fetchOperators() async {
+    var cachedData = JsonCache.get('operatorData');
+
+    if (cachedData != null) {
+      try {
+        return json.decode(cachedData) as Map<String, dynamic>;
+      } catch (e) {
+        print('Error decoding cached data: $e');
+      }
+    }
+
     final url = Uri.parse(
         'https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/en_US/gamedata/excel/character_table.json');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
-      return json.decode(response.body) as Map<String, dynamic>;
+      final parsedData = json.decode(response.body);
+      JsonCache.set('operatorData', response.body);
+      return parsedData as Map<String, dynamic>;
     } else {
       throw Exception('Failed to load operators');
     }
@@ -118,62 +146,61 @@ class _ArchiveContentState extends State<ArchiveContent> {
                   },
                 ),
                 const SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.only(right: 8),
-                        child: Text("Choose Rarity:"),
-                      ),
-                      ...List.generate(6, (rarity) {
-                        return GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              if (_selectedRarities.contains(rarity + 1)) {
-                                _selectedRarities.remove(rarity + 1);
-                              } else {
-                                _selectedRarities.add(rarity + 1);
-                              }
-                            });
-                            filterOperators(operators);
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: _selectedRarities.contains(rarity + 1)
-                                  ? ColorFab.midAccent
-                                  : Colors.grey,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Text(
-                              (rarity + 1).toString(),
-                              style: const TextStyle(color: Colors.white),
-                            ),
-                          ),
-                        );
-                      }),
-                      GestureDetector(
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.only(right: 8),
+                      child: Text("Choose Rarity:"),
+                    ),
+                    ...List.generate(6, (rarity) {
+                      return GestureDetector(
                         onTap: () {
                           setState(() {
-                            _selectedRarities = [];
+                            if (_selectedRarities.contains(rarity + 1)) {
+                              _selectedRarities.remove(rarity + 1);
+                            } else {
+                              _selectedRarities.add(rarity + 1);
+                            }
                           });
                           filterOperators(operators);
                         },
                         child: Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: Colors.redAccent,
+                            color: _selectedRarities.contains(rarity + 1)
+                                ? ColorFab.midAccent
+                                : Colors.grey,
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: const Text(
-                            "Clear",
-                            style: TextStyle(color: Colors.white),
+                          child: Text(
+                            (rarity + 1).toString(),
+                            style: const TextStyle(color: Colors.white),
                           ),
                         ),
+                      );
+                    }),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _selectedRarities = [];
+                        });
+                        filterOperators(operators);
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: ColorFab.redAccent,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Text(
+                          "Clear",
+                          style: TextStyle(color: Colors.white),
+                        ),
                       ),
-                    ],
-                  ),
-                
+                    ),
+                  ],
+                ),
                 const SizedBox(height: 10),
                 Expanded(
                   child: GridView.builder(

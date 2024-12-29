@@ -85,9 +85,16 @@ class _RecruitSimState extends State<RecruitSim> {
 
   void toggleTag(List<String> tagList, String tag) {
     setState(() {
+      // Count total selected tags across all categories
+      int totalSelectedTags = rarityTags.length +
+          positionTags.length +
+          classTags.length +
+          otherTags.length;
+
       if (tagList.contains(tag)) {
         tagList.remove(tag);
-      } else {
+      } else if (totalSelectedTags < 5) {
+        // Check if the total selected tags are less than 5
         tagList.add(tag);
       }
     });
@@ -117,17 +124,15 @@ class _RecruitSimState extends State<RecruitSim> {
                 padding:
                     const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                 decoration: BoxDecoration(
-                  color: isSelected ? Colors.black : Colors.blue,
+                  color: isSelected ? ColorFab.midAccent : Colors.grey,
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
-                    color: isSelected ? ColorFab.midAccent : Colors.grey,
+                    color: isSelected ? ColorFab.grey : ColorFab.midAccent,
                   ),
                 ),
                 child: Text(
                   tag,
-                  style: TextStyle(
-                    color: ColorFab.offWhite
-                  ),
+                  style: TextStyle(color: ColorFab.offWhite),
                 ),
               ),
             );
@@ -139,12 +144,19 @@ class _RecruitSimState extends State<RecruitSim> {
 
   @override
   Widget build(BuildContext context) {
+    final finalKey = [
+      ...rarityTags,
+      ...positionTags,
+      ...classTags,
+      ...otherTags
+    ]..sort();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Recruit Simulator"),
-        backgroundColor: Colors.black,
+        backgroundColor: ColorFab.offWhite,
       ),
-      backgroundColor: Colors.black,
+      backgroundColor: ColorFab.offWhite,
       body: Padding(
         padding: const EdgeInsets.all(10.0),
         child: SingleChildScrollView(
@@ -160,32 +172,34 @@ class _RecruitSimState extends State<RecruitSim> {
                     otherTags.clear();
                   });
                 },
+                style: ButtonStyle(
+                  backgroundColor: WidgetStateProperty.all(ColorFab.redAccent),
+                  foregroundColor: WidgetStateProperty.all(ColorFab.offWhite),
+                ),
                 child: const Text("Reset Selected Tags"),
               ),
               const SizedBox(height: 10),
               buildTagSection("Based on Rarity", rarityTags, tags["Rarity"]!),
               const SizedBox(height: 10),
-              buildTagSection("Based on Position", positionTags, tags["Position"]!),
+              buildTagSection(
+                  "Based on Position", positionTags, tags["Position"]!),
               const SizedBox(height: 10),
               buildTagSection("Based on Class", classTags, tags["Class"]!),
               const SizedBox(height: 10),
               buildTagSection("Other Tags", otherTags, tags["Other"]!),
               const SizedBox(height: 20),
               const Text(
-                "Selected Tags:",
+                "Possible Combinations",
                 style: TextStyle(
-                  color: Colors.white,
+                  color: ColorFab.offBlack,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               Text(
-                "Rarity: ${rarityTags.join(', ')}\n"
-                "Position: ${positionTags.join(', ')}\n"
-                "Class: ${classTags.join(', ')}\n"
-                "Other: ${otherTags.join(', ')}",
+                "Tags: ${finalKey.join(', ')}",
                 style: const TextStyle(
-                  color: Colors.white,
+                  color: ColorFab.offBlack,
                   fontSize: 14,
                 ),
               ),
