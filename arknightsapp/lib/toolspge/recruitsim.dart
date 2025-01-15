@@ -18,13 +18,30 @@ class _RecruitSimState extends State<RecruitSim> {
     "Rarity": ["Top Operator", "Senior Operator", "Starter", "Robot"],
     "Position": ["Melee", "Ranged"],
     "Class": [
-      "Caster", "Defender", "Guard", "Medic", "Sniper", 
-      "Specialist", "Supporter", "Vanguard",
+      "Caster",
+      "Defender",
+      "Guard",
+      "Medic",
+      "Sniper",
+      "Specialist",
+      "Supporter",
+      "Vanguard",
     ],
     "Other": [
-      "AoE", "Crowd-Control", "DP-Recovery", "DPS", "Debuff",
-      "Defense", "Fast-Redeploy", "Healing", "Nuker", "Shift",
-      "Slow", "Summon", "Support", "Survival",
+      "AoE",
+      "Crowd-Control",
+      "DP-Recovery",
+      "DPS",
+      "Debuff",
+      "Defense",
+      "Fast-Redeploy",
+      "Healing",
+      "Nuker",
+      "Shift",
+      "Slow",
+      "Summon",
+      "Support",
+      "Survival",
     ],
   };
 
@@ -65,15 +82,15 @@ class _RecruitSimState extends State<RecruitSim> {
 
   List<List<String>> _getCombinations(List<String> list) {
     if (list.isEmpty) return [];
-    
+
     List<List<String>> result = [];
     int n = list.length;
-    
+
     for (int size = 1; size <= math.min(3, n); size++) {
       for (int i = 0; i < (1 << n); i++) {
         int bits = i.toRadixString(2).split('1').length - 1;
         if (bits != size) continue;
-        
+
         List<String> combination = [];
         for (int j = 0; j < n; j++) {
           if ((i & (1 << j)) != 0) {
@@ -88,25 +105,27 @@ class _RecruitSimState extends State<RecruitSim> {
 
   void _updateResults() {
     if (_recruitsData == null) return;
-    
+
     final List<String> tagsList = selectedTags.toList()..sort();
     final combinations = _getCombinations(tagsList);
-    
+
     List<Map<String, dynamic>> newResults = [];
-    
+
     for (var combination in combinations) {
       final combinationKey = combination.join(',');
       if (_recruitsData!.containsKey(combinationKey)) {
-        final recruitsList = _recruitsData![combinationKey]['operators'] as List;
+        final recruitsList =
+            _recruitsData![combinationKey]['operators'] as List;
         if (recruitsList.isNotEmpty) {
           newResults.add({
             'key': combinationKey,
-            'recruitIds': recruitsList.map<String>((r) => r['id'] as String).toList(),
+            'recruitIds':
+                recruitsList.map<String>((r) => r['id'] as String).toList(),
           });
         }
       }
     }
-    
+
     setState(() {
       _currentResults = newResults;
     });
@@ -132,7 +151,8 @@ class _RecruitSimState extends State<RecruitSim> {
             return GestureDetector(
               onTap: () => _toggleTag(tag),
               child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                 decoration: BoxDecoration(
                   color: isSelected ? ColorFab.midAccent : Colors.grey,
                   borderRadius: BorderRadius.circular(10),
@@ -166,7 +186,7 @@ class _RecruitSimState extends State<RecruitSim> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
-          
+
           if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           }
@@ -187,8 +207,10 @@ class _RecruitSimState extends State<RecruitSim> {
                           });
                         },
                         style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(ColorFab.redAccent),
-                          foregroundColor: MaterialStateProperty.all(ColorFab.offWhite),
+                          backgroundColor:
+                              MaterialStateProperty.all(ColorFab.redAccent),
+                          foregroundColor:
+                              MaterialStateProperty.all(ColorFab.offWhite),
                         ),
                         child: const Text("Reset Selected Tags"),
                       ),
@@ -219,13 +241,14 @@ class _RecruitSimState extends State<RecruitSim> {
                 delegate: SliverChildBuilderDelegate(
                   (context, index) {
                     if (index >= _currentResults.length) return null;
-                    
+
                     final result = _currentResults[index];
                     final combinationKey = result['key'] as String;
                     final recruitIds = result['recruitIds'] as List<String>;
 
                     return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 5),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -238,7 +261,13 @@ class _RecruitSimState extends State<RecruitSim> {
                             ),
                           ),
                           const SizedBox(height: 4),
-                          ...recruitIds.map((id) => RecruitOpDisplay(id: id)),
+                          ...recruitIds.map((id) => Text(
+                                id,
+                                style: const TextStyle(
+                                  color: ColorFab.offBlack,
+                                  fontSize: 12,
+                                ),
+                              )),
                         ],
                       ),
                     );
