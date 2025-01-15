@@ -31,7 +31,6 @@ class JsonCache {
 
 class _OperatorDisplayState extends State<OperatorDisplay> {
   late Future<Map<String, dynamic>> _operatorsFuture;
-  List<dynamic> _filteredOperators = [];
 
   @override
   void initState() {
@@ -63,6 +62,7 @@ class _OperatorDisplayState extends State<OperatorDisplay> {
     }
   }
 
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<Map<String, dynamic>>(
@@ -78,32 +78,20 @@ class _OperatorDisplayState extends State<OperatorDisplay> {
               .map((entry) => entry.value)
               .toList();
 
-          final filteredOperators = Map.fromIterable(
-            widget.recruitableOperators,
-            key: (element) => element['id'],
-            value: (element) {
-              final key = element['id'];
-              return operators[key];
-            },
-          );
-
-          return Container(
-            color: ColorFab.offWhite,
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: GridView.builder(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 4,
-                crossAxisSpacing: 3,
-                mainAxisSpacing: 3,
-                childAspectRatio: 0.825,
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 5.0),
-              itemCount: filteredOperators.length,
-              itemBuilder: (context, index) {
-                final operator = filteredOperators[index];
-                return OperatorTile(operator);
-              },
+          return GridView.builder(
+            physics: const NeverScrollableScrollPhysics(), 
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 4,
+              crossAxisSpacing: 3,
+              mainAxisSpacing: 3,
+              childAspectRatio: 0.825,
             ),
+            shrinkWrap: true, 
+            itemCount: widget.recruitableOperators.length,
+            itemBuilder: (context, index) {
+              return Text(
+                  'Recruitable Operator ID: ${widget.recruitableOperators[index]["id"]}');
+            },
           );
         } else {
           return const Center(child: Text('No data available'));

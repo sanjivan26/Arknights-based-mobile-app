@@ -1,16 +1,10 @@
+import 'dart:async';
 import 'dart:convert';
 import '../colorfab.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import './operatortile.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
-
-class ArchiveContent extends StatefulWidget {
-  const ArchiveContent({super.key});
-
-  @override
-  State<ArchiveContent> createState() => _ArchiveContentState();
-}
 
 class JsonCache {
   static final Map<String, String> _cache = {};
@@ -28,12 +22,22 @@ class JsonCache {
   }
 }
 
+class ArchiveContent extends StatefulWidget {
+  const ArchiveContent({super.key});
+
+  @override
+  State<ArchiveContent> createState() => _ArchiveContentState();
+}
+
 class _ArchiveContentState extends State<ArchiveContent> {
   late Future<Map<String, dynamic>> _operatorsFuture;
+  List<dynamic> _allOperators = [];
   List<dynamic> _filteredOperators = [];
   String _searchText = '';
   List<String> _selectedClasses = [];
   List<int> _selectedRarities = [];
+  Timer? _debounceTimer;
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -41,46 +45,86 @@ class _ArchiveContentState extends State<ArchiveContent> {
     _operatorsFuture = fetchOperators();
   }
 
+  @override
+  void dispose() {
+    _debounceTimer?.cancel();
+    super.dispose();
+  }
+
   Future<Map<String, dynamic>> fetchOperators() async {
-    var cachedData = JsonCache.get('operatorData');
+    setState(() => _isLoading = true);
+    try {
+      var cachedData = JsonCache.get('operatorData');
 
-    if (cachedData != null) {
-      try {
-        return json.decode(cachedData) as Map<String, dynamic>;
-      } catch (e) {
-        print('Error decoding cached data: $e');
+      if (cachedData != null) {
+        final parsedData = json.decode(cachedData) as Map<String, dynamic>;
+        await _initializeOperators(parsedData);
+        return parsedData;
       }
-    }
 
-    final url = Uri.parse(
-        'https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/en_US/gamedata/excel/character_table.json');
-    final response = await http.get(url);
+      final url = Uri.parse(
+          'https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/en_US/gamedata/excel/character_table.json');
+      final response = await http.get(url);
 
-    if (response.statusCode == 200) {
-      final parsedData = json.decode(response.body);
-      JsonCache.set('operatorData', response.body);
-      return parsedData as Map<String, dynamic>;
-    } else {
-      throw Exception('Failed to load operators');
+      if (response.statusCode == 200) {
+        final parsedData = json.decode(response.body);
+        JsonCache.set('operatorData', response.body);
+        await _initializeOperators(parsedData);
+        return parsedData as Map<String, dynamic>;
+      } else {
+        throw Exception('Failed to load operators');
+      }
+    } finally {
+      setState(() => _isLoading = false);
     }
   }
 
-  void filterOperators(List<dynamic> operators) {
+  Future<void> _initializeOperators(Map<String, dynamic> data) async {
+    _allOperators = data.entries
+        .where((entry) => entry.key.startsWith('char'))
+        .map((entry) => entry.value)
+        .toList();
+    
+    // Sort operators by name initially
+    _allOperators.sort((a, b) => 
+      (a['name'] as String).compareTo(b['name'] as String)
+    );
+    
+    _filteredOperators = List.from(_allOperators);
+  }
+
+  void filterOperators() {
+    if (_isLoading) return;
+
+    if (_searchText.isEmpty && _selectedClasses.isEmpty && _selectedRarities.isEmpty) {
+      setState(() {
+        _filteredOperators = List.from(_allOperators);
+      });
+      return;
+    }
+
+    final searchLower = _searchText.toLowerCase();
     setState(() {
-      _filteredOperators = operators.where((op) {
-        final matchesSearch = op['name']
-            .toString()
-            .toLowerCase()
-            .contains(_searchText.toLowerCase());
-        final matchesClass = _selectedClasses.isEmpty ||
-            _selectedClasses.contains(op['profession']);
-        int rarity = 0;
-        var rarityValue = op['rarity'];
-        rarity =
-            int.tryParse(rarityValue.substring(rarityValue.length - 1)) ?? 0;
-        final matchesRarity =
-            _selectedRarities.isEmpty || _selectedRarities.contains(rarity);
-        return matchesSearch && matchesClass && matchesRarity;
+      _filteredOperators = _allOperators.where((op) {
+        if (_searchText.isNotEmpty &&
+            !op['name'].toString().toLowerCase().contains(searchLower)) {
+          return false;
+        }
+        
+        if (_selectedClasses.isNotEmpty &&
+            !_selectedClasses.contains(op['profession'])) {
+          return false;
+        }
+
+        if (_selectedRarities.isNotEmpty) {
+          var rarityValue = op['rarity'];
+          int rarity = int.tryParse(rarityValue.substring(rarityValue.length - 1)) ?? 0;
+          if (!_selectedRarities.contains(rarity)) {
+            return false;
+          }
+        }
+
+        return true;
       }).toList();
     });
   }
@@ -95,15 +139,6 @@ class _ArchiveContentState extends State<ArchiveContent> {
         } else if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
         } else if (snapshot.hasData) {
-          final operators = snapshot.data!.entries
-              .where((entry) => entry.key.startsWith('char'))
-              .map((entry) => entry.value)
-              .toList();
-
-          if (_filteredOperators.isEmpty) {
-            _filteredOperators = operators;
-          }
-
           return Container(
             color: ColorFab.offWhite,
             padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -116,8 +151,13 @@ class _ArchiveContentState extends State<ArchiveContent> {
                     prefixIcon: Icon(Icons.search),
                   ),
                   onChanged: (value) {
-                    _searchText = value;
-                    filterOperators(operators);
+                    if (_debounceTimer?.isActive ?? false) _debounceTimer!.cancel();
+                    _debounceTimer = Timer(const Duration(milliseconds: 300), () {
+                      if (mounted) {
+                        _searchText = value;
+                        filterOperators();
+                      }
+                    });
                   },
                 ),
                 const SizedBox(height: 10),
@@ -139,10 +179,10 @@ class _ArchiveContentState extends State<ArchiveContent> {
                   initialValue: _selectedClasses,
                   buttonText: const Text("Select Classes"),
                   onConfirm: (selectedClasses) {
-                    setState(() {
+                    if (mounted) {
                       _selectedClasses = selectedClasses.cast<String>();
-                    });
-                    filterOperators(operators);
+                      filterOperators();
+                    }
                   },
                 ),
                 const SizedBox(height: 10),
@@ -156,14 +196,16 @@ class _ArchiveContentState extends State<ArchiveContent> {
                     ...List.generate(6, (rarity) {
                       return GestureDetector(
                         onTap: () {
-                          setState(() {
-                            if (_selectedRarities.contains(rarity + 1)) {
-                              _selectedRarities.remove(rarity + 1);
-                            } else {
-                              _selectedRarities.add(rarity + 1);
-                            }
-                          });
-                          filterOperators(operators);
+                          if (mounted) {
+                            setState(() {
+                              if (_selectedRarities.contains(rarity + 1)) {
+                                _selectedRarities.remove(rarity + 1);
+                              } else {
+                                _selectedRarities.add(rarity + 1);
+                              }
+                            });
+                            filterOperators();
+                          }
                         },
                         child: Container(
                           padding: const EdgeInsets.all(8),
@@ -182,10 +224,12 @@ class _ArchiveContentState extends State<ArchiveContent> {
                     }),
                     GestureDetector(
                       onTap: () {
-                        setState(() {
-                          _selectedRarities = [];
-                        });
-                        filterOperators(operators);
+                        if (mounted) {
+                          setState(() {
+                            _selectedRarities = [];
+                          });
+                          filterOperators();
+                        }
                       },
                       child: Container(
                         padding: const EdgeInsets.all(8),
@@ -204,8 +248,7 @@ class _ArchiveContentState extends State<ArchiveContent> {
                 const SizedBox(height: 10),
                 Expanded(
                   child: GridView.builder(
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 4,
                       crossAxisSpacing: 3,
                       mainAxisSpacing: 3,
@@ -213,9 +256,17 @@ class _ArchiveContentState extends State<ArchiveContent> {
                     ),
                     padding: const EdgeInsets.symmetric(horizontal: 5.0),
                     itemCount: _filteredOperators.length,
+                    cacheExtent: 500,
+                    addAutomaticKeepAlives: false,
+                    addRepaintBoundaries: true,
                     itemBuilder: (context, index) {
                       final operator = _filteredOperators[index];
-                      return OperatorTile(operator);
+                      return RepaintBoundary(
+                        child: OperatorTile(
+                          operator,
+                          key: ValueKey('operator_${operator['name']}'),
+                        ),
+                      );
                     },
                   ),
                 ),
