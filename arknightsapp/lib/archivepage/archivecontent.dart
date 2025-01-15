@@ -85,7 +85,6 @@ class _ArchiveContentState extends State<ArchiveContent> {
         .map((entry) => entry.value)
         .toList();
     
-    // Sort operators by name initially
     _allOperators.sort((a, b) => 
       (a['name'] as String).compareTo(b['name'] as String)
     );

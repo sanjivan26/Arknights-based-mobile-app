@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import './../colorfab.dart';
-import './recruitsim.dart';
+import 'recruitsim/recruitsim.dart';
+import 'resourcecalculator/levelcostcalc.dart';
 
 class ToolsPage extends StatelessWidget {
   const ToolsPage({super.key});
@@ -39,11 +40,48 @@ class ToolsPage extends StatelessWidget {
                 child: Stack(
                   children: [
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 5),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 5),
                       child: Align(
                         alignment: Alignment.bottomRight,
                         child: const Text(
                           "Recruit Simulator",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const LevelCostCalc(),
+                  ),
+                );
+              },
+              child: Container(
+                height: boxHeight,
+                decoration: BoxDecoration(
+                  color: ColorFab.midAccent,
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                child: Stack(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 5),
+                      child: Align(
+                        alignment: Alignment.bottomRight,
+                        child: const Text(
+                          "Resource Calculator",
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 18,
