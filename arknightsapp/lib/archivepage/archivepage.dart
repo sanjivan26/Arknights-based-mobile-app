@@ -1,6 +1,5 @@
 import './archivecontent.dart';
 import 'package:flutter/material.dart';
-import './../colorfab.dart';
 
 class ArchivePage extends StatefulWidget {
   const ArchivePage({super.key});
@@ -14,10 +13,12 @@ class _ArchivePageState extends State<ArchivePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: ColorFab.offWhite,
-        title: const Text('Archive'),
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        title: Text('Archive', style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface),),
       ),
-      body: const ArchiveContent(),
+      body: Container(
+        color: Theme.of(context).colorScheme.surface,
+        child: const ArchiveContent()),
     );
   }
 }

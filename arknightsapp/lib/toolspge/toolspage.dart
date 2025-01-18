@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import './../colorfab.dart';
 import 'recruitsim/recruitsim.dart';
 import 'resourcecalculator/levelcostcalc.dart';
 
@@ -12,12 +11,12 @@ class ToolsPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Tools"),
-        backgroundColor: ColorFab.offWhite,
+        title: Text("Tools", style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface),),
+        backgroundColor: Theme.of(context).colorScheme.surface,
       ),
       body: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10.0),
-        decoration: BoxDecoration(color: ColorFab.offWhite),
+        decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface,),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -34,7 +33,7 @@ class ToolsPage extends StatelessWidget {
                 height: boxHeight,
                 margin: const EdgeInsets.symmetric(vertical: 10.0),
                 decoration: BoxDecoration(
-                  color: ColorFab.midAccent,
+                  color: Theme.of(context).colorScheme.surfaceTint,
                   borderRadius: BorderRadius.circular(8.0),
                 ),
                 child: Stack(
@@ -44,10 +43,10 @@ class ToolsPage extends StatelessWidget {
                           horizontal: 10, vertical: 5),
                       child: Align(
                         alignment: Alignment.bottomRight,
-                        child: const Text(
+                        child: Text(
                           "Recruit Simulator",
                           style: TextStyle(
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.inverseSurface,
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
@@ -70,7 +69,7 @@ class ToolsPage extends StatelessWidget {
               child: Container(
                 height: boxHeight,
                 decoration: BoxDecoration(
-                  color: ColorFab.midAccent,
+                  color: Theme.of(context).colorScheme.surfaceTint,
                   borderRadius: BorderRadius.circular(8.0),
                 ),
                 child: Stack(
@@ -80,10 +79,10 @@ class ToolsPage extends StatelessWidget {
                           horizontal: 10, vertical: 5),
                       child: Align(
                         alignment: Alignment.bottomRight,
-                        child: const Text(
+                        child: Text(
                           "Resource Calculator",
                           style: TextStyle(
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.inverseSurface,
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),

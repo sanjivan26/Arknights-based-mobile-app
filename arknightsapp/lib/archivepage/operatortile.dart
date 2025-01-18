@@ -1,4 +1,3 @@
-import './../colorfab.dart';
 import 'package:flutter/material.dart';
 import './operatordetails.dart';
 import './imagemapping.dart';
@@ -35,7 +34,7 @@ class _OperatorTileState extends State<OperatorTile> {
         child: Container(
           padding: const EdgeInsets.all(3.0),
           decoration: BoxDecoration(
-            color: ColorFab.lightShadow,
+            color: Theme.of(context).colorScheme.surfaceContainer,
             borderRadius: BorderRadius.circular(5),
           ),
           child: Column(
@@ -47,7 +46,7 @@ class _OperatorTileState extends State<OperatorTile> {
                 height: imageSize,
                 decoration: BoxDecoration(
                   border: Border.all(
-                    color: ColorFab.darkAccent,
+                    color: Theme.of(context).colorScheme.inverseSurface,
                     width: 2,
                   ),
                   borderRadius: BorderRadius.circular(15),
@@ -63,7 +62,7 @@ class _OperatorTileState extends State<OperatorTile> {
               Flexible(
                 child: Text(
                   operator['name'] ?? 'Unknown Operator',
-                  style: const TextStyle(color: ColorFab.offBlack),
+                  style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface),
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
                 ),

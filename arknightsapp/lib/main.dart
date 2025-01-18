@@ -1,11 +1,18 @@
+import 'package:arknightsapp/theme/themeprovider.dart';
 import './archivepage/archivepage.dart';
 import './homepage/homepage.dart';
 import './toolspge/toolspage.dart';
 import 'package:flutter/material.dart';
-import './colorfab.dart';
+import 'package:provider/provider.dart'; 
 
 void main() {
-  runApp(const App());
+  runApp(
+    // Wrap your app with ChangeNotifierProvider here
+    ChangeNotifierProvider(
+      create: (context) => ThemeProvider(),  // Provide the ThemeProvider
+      child: const App(),
+    ),
+  );
 }
 
 class App extends StatelessWidget {
@@ -13,8 +20,13 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: const MainScreen(),
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, child) {
+        return MaterialApp(
+          home: const MainScreen(),
+          theme: themeProvider.themedata,  // Use the theme from ThemeProvider
+        );
+      },
     );
   }
 }
@@ -46,9 +58,9 @@ class _MainScreenState extends State<MainScreen> {
     return Scaffold(
       body: _pages[_selectedIndex],  
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: ColorFab.offWhite,
-        selectedItemColor: ColorFab.offBlack, 
-        unselectedItemColor: ColorFab.grey,       
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        selectedItemColor: Theme.of(context).colorScheme.primary,
+        unselectedItemColor: const Color(0xFF8C8C8C),       
         currentIndex: _selectedIndex,  
         onTap: _onItemTapped,  
         items: const [

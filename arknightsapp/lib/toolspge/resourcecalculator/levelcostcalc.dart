@@ -186,10 +186,14 @@ class _LevelCostCalcState extends State<LevelCostCalc> {
         FocusScope.of(context).unfocus();
       },
       child: Scaffold(
-        backgroundColor: ColorFab.offWhite,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         appBar: AppBar(
-          backgroundColor: ColorFab.offWhite,
-          title: const Text("Resource Estimator"),
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          title: Text(
+            "Resource Estimator",
+            style:
+                TextStyle(color: Theme.of(context).colorScheme.inverseSurface),
+          ),
         ),
         body: costDataObj == null
             ? Center(child: CircularProgressIndicator())
@@ -200,7 +204,10 @@ class _LevelCostCalcState extends State<LevelCostCalc> {
                   children: [
                     const SizedBox(height: 10),
                     Text("Choose Operator Rarity",
-                        style: const TextStyle(fontSize: 16)),
+                        style: TextStyle(
+                            fontSize: 16,
+                            color:
+                                Theme.of(context).colorScheme.inverseSurface)),
                     _buildDropdown(rarities, selectedRarity, (value) {
                       setState(() {
                         selectedRarity = value;
@@ -229,6 +236,8 @@ class _LevelCostCalcState extends State<LevelCostCalc> {
                             child: Icon(
                               Icons.double_arrow,
                               size: 30.0,
+                              color:
+                                  Theme.of(context).colorScheme.inverseSurface,
                             )),
                         Expanded(
                           child: _buildEliteLevelInfo(
@@ -247,12 +256,12 @@ class _LevelCostCalcState extends State<LevelCostCalc> {
                       ],
                     ),
                     const SizedBox(height: 20),
-                    const Text(
+                    Text(
                       "Required Resources",
                       style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.inverseSurface),
                     ),
                     const SizedBox(height: 10),
                     _buildResourceDisplay(),
@@ -276,7 +285,10 @@ class _LevelCostCalcState extends State<LevelCostCalc> {
                       value: item["value"],
                       child: Text(
                         item["label"],
-                        style: const TextStyle(fontSize: 16),
+                        style: TextStyle(
+                            fontSize: 16,
+                            color:
+                                Theme.of(context).colorScheme.inverseSurface),
                       ),
                     ))
                 .toList(),
@@ -290,14 +302,14 @@ class _LevelCostCalcState extends State<LevelCostCalc> {
             dropdownStyleData: DropdownStyleData(
               maxHeight: 200,
               decoration: BoxDecoration(
-                color: ColorFab.lightShadow,
+                color: Theme.of(context).colorScheme.primaryFixedDim,
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
             buttonStyleData: ButtonStyleData(
               height: 50,
               decoration: BoxDecoration(
-                color: ColorFab.lightGrey,
+                color: Theme.of(context).colorScheme.primaryFixedDim,
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
@@ -316,7 +328,10 @@ class _LevelCostCalcState extends State<LevelCostCalc> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontSize: 16)),
+        Text(label,
+            style: TextStyle(
+                fontSize: 16,
+                color: Theme.of(context).colorScheme.inverseSurface)),
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
@@ -340,9 +355,7 @@ class _LevelCostCalcState extends State<LevelCostCalc> {
                 onSubmitted: (value) {
                   inputValidifier();
                 },
-                // Remove onEditingComplete since it's redundant with onSubmitted
-                textInputAction:
-                    TextInputAction.done, // Explicitly set the keyboard action
+                textInputAction: TextInputAction.done,
               ),
             ],
           ),

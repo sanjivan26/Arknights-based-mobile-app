@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import '../colorfab.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import './operatortile.dart';
@@ -13,8 +12,8 @@ class JsonCache {
     return _cache[key];
   }
 
-  static void set(String key, dynamic jsonData) {
-    _cache[key] = jsonEncode(jsonData);
+  static void set(String key, String jsonString) {
+    _cache[key] = jsonString;
   }
 
   static void clear() {
@@ -52,32 +51,33 @@ class _ArchiveContentState extends State<ArchiveContent> {
   }
 
   Future<Map<String, dynamic>> fetchOperators() async {
-    setState(() => _isLoading = true);
-    try {
-      var cachedData = JsonCache.get('operatorData');
+  setState(() => _isLoading = true);
+  try {
+    var cachedData = JsonCache.get('operatorData');
 
-      if (cachedData != null) {
-        final parsedData = json.decode(cachedData) as Map<String, dynamic>;
-        await _initializeOperators(parsedData);
-        return parsedData;
-      }
-
-      final url = Uri.parse(
-          'https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/en_US/gamedata/excel/character_table.json');
-      final response = await http.get(url);
-
-      if (response.statusCode == 200) {
-        final parsedData = json.decode(response.body);
-        JsonCache.set('operatorData', response.body);
-        await _initializeOperators(parsedData);
-        return parsedData as Map<String, dynamic>;
-      } else {
-        throw Exception('Failed to load operators');
-      }
-    } finally {
-      setState(() => _isLoading = false);
+    if (cachedData != null) {
+      final parsedData = json.decode(cachedData) as Map<String, dynamic>;
+      await _initializeOperators(parsedData);
+      return parsedData;
     }
+
+    final url = Uri.parse(
+        'https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/en_US/gamedata/excel/character_table.json');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      JsonCache.set('operatorData', response.body);
+      final parsedData = json.decode(response.body) as Map<String, dynamic>;
+      await _initializeOperators(parsedData);
+      return parsedData;
+    } else {
+      throw Exception('Failed to load operators');
+    }
+  } finally {
+    setState(() => _isLoading = false);
   }
+}
+
 
   Future<void> _initializeOperators(Map<String, dynamic> data) async {
     _allOperators = data.entries
@@ -139,7 +139,7 @@ class _ArchiveContentState extends State<ArchiveContent> {
           return Center(child: Text('Error: ${snapshot.error}'));
         } else if (snapshot.hasData) {
           return Container(
-            color: ColorFab.offWhite,
+            color: Theme.of(context).colorScheme.surface,
             padding: const EdgeInsets.symmetric(horizontal: 10),
             child: Column(
               children: [
@@ -161,9 +161,11 @@ class _ArchiveContentState extends State<ArchiveContent> {
                 ),
                 const SizedBox(height: 10),
                 MultiSelectDialogField<String>(
-                  searchHint: "Select Required Classes",
-                  selectedItemsTextStyle: TextStyle(color: ColorFab.offBlack),
-                  selectedColor: ColorFab.offBlack,
+                  selectedItemsTextStyle: TextStyle(color: Theme.of(context).colorScheme.inverseSurface),
+                  selectedColor: Theme.of(context).colorScheme.inverseSurface,
+                  backgroundColor: Theme.of(context).colorScheme.onSurface,
+                  checkColor: Theme.of(context).colorScheme.surfaceContainer,
+
                   items: [
                     MultiSelectItem<String>('PIONEER', 'Vanguard'),
                     MultiSelectItem<String>('WARRIOR', 'Guard'),
@@ -174,9 +176,9 @@ class _ArchiveContentState extends State<ArchiveContent> {
                     MultiSelectItem<String>('SUPPORT', 'Supporter'),
                     MultiSelectItem<String>('SPECIAL', 'Specialist'),
                   ],
-                  title: const Text('Select Classes'),
+                  title: Text('Select Classes',style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface)),
                   initialValue: _selectedClasses,
-                  buttonText: const Text("Select Classes"),
+                  buttonText: Text("Select Classes",style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface)),
                   onConfirm: (selectedClasses) {
                     if (mounted) {
                       _selectedClasses = selectedClasses.cast<String>();
@@ -188,9 +190,9 @@ class _ArchiveContentState extends State<ArchiveContent> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Padding(
+                    Padding(
                       padding: EdgeInsets.only(right: 8),
-                      child: Text("Choose Rarity:"),
+                      child: Text("Choose Rarity:",style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface),),
                     ),
                     ...List.generate(6, (rarity) {
                       return GestureDetector(
@@ -210,13 +212,13 @@ class _ArchiveContentState extends State<ArchiveContent> {
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
                             color: _selectedRarities.contains(rarity + 1)
-                                ? ColorFab.midAccent
-                                : Colors.grey,
+                                ? Theme.of(context).colorScheme.onSurfaceVariant
+                                : Theme.of(context).colorScheme.onSurface,
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Text(
                             (rarity + 1).toString(),
-                            style: const TextStyle(color: Colors.white),
+                            style: TextStyle(color: Theme.of(context).colorScheme.surface),
                           ),
                         ),
                       );
@@ -233,12 +235,12 @@ class _ArchiveContentState extends State<ArchiveContent> {
                       child: Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: ColorFab.redAccent,
+                          color: Theme.of(context).colorScheme.error,
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        child: const Text(
+                        child: Text(
                           "Clear",
-                          style: TextStyle(color: Colors.white),
+                          style: TextStyle(color: Theme.of(context).colorScheme.surface),
                         ),
                       ),
                     ),

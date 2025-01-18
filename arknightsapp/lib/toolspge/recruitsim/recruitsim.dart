@@ -135,8 +135,8 @@ class _RecruitSimState extends State<RecruitSim> {
       children: [
         Text(
           label,
-          style: const TextStyle(
-            color: ColorFab.offBlack,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.inverseSurface,
             fontSize: 16,
             fontWeight: FontWeight.bold,
           ),
@@ -152,7 +152,7 @@ class _RecruitSimState extends State<RecruitSim> {
                 padding:
                     const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                 decoration: BoxDecoration(
-                  color: isSelected ? ColorFab.midAccent : Colors.grey,
+                  color: isSelected ? Theme.of(context).colorScheme.onSurfaceVariant : Theme.of(context).colorScheme.onSurface,
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
                     color: isSelected ? ColorFab.grey : ColorFab.midAccent,
@@ -160,7 +160,7 @@ class _RecruitSimState extends State<RecruitSim> {
                 ),
                 child: Text(
                   tag,
-                  style: TextStyle(color: ColorFab.offWhite),
+                  style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface),
                 ),
               ),
             );
@@ -174,10 +174,10 @@ class _RecruitSimState extends State<RecruitSim> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Recruit Simulator"),
-        backgroundColor: ColorFab.offWhite,
+        title: Text("Recruit Simulator", style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface),),
+        backgroundColor: Theme.of(context).colorScheme.surface,
       ),
-      backgroundColor: ColorFab.offWhite,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: FutureBuilder<Map<String, dynamic>>(
         future: _recruitsFuture,
         builder: (context, snapshot) {
@@ -206,7 +206,7 @@ class _RecruitSimState extends State<RecruitSim> {
                         },
                         style: ButtonStyle(
                           backgroundColor:
-                              WidgetStateProperty.all(ColorFab.redAccent),
+                              WidgetStateProperty.all(Theme.of(context).colorScheme.onError),
                           foregroundColor:
                               WidgetStateProperty.all(ColorFab.offWhite),
                         ),
@@ -222,10 +222,10 @@ class _RecruitSimState extends State<RecruitSim> {
                       _buildTagSection("Other Tags", tags["Other"]!),
                       if (_currentResults.isNotEmpty) ...[
                         const SizedBox(height: 20),
-                        const Text(
+                        Text(
                           "Recruitable Operators",
                           style: TextStyle(
-                            color: ColorFab.offBlack,
+                            color: Theme.of(context).colorScheme.inverseSurface,
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
@@ -252,8 +252,8 @@ class _RecruitSimState extends State<RecruitSim> {
                         children: [
                           Text(
                             combinationKey,
-                            style: const TextStyle(
-                              color: ColorFab.offBlack,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.inverseSurface,
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
                             ),
@@ -261,8 +261,8 @@ class _RecruitSimState extends State<RecruitSim> {
                           const SizedBox(height: 4),
                           ...recruitIds.map((id) => Text(
                                 id,
-                                style: const TextStyle(
-                                  color: ColorFab.offBlack,
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.inverseSurface,
                                   fontSize: 12,
                                 ),
                               )),
