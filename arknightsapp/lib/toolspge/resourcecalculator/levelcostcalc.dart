@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:flutter/services.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import './../../colorfab.dart';
 
@@ -6,6 +8,7 @@ class LevelCostCalc extends StatefulWidget {
   const LevelCostCalc({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _LevelCostCalcState createState() => _LevelCostCalcState();
 }
 
@@ -32,97 +35,236 @@ class _LevelCostCalcState extends State<LevelCostCalc> {
   int endLevel = 1;
 
   Map<String, int> calculatedResources = {"lmd": 0, "exp": 0};
+  Map<String, dynamic>? costDataObj;
 
-  void resourceCalculator() {
-    if (endElite < startElite ||
-        (endElite == startElite && endLevel < startLevel)) {
-      setState(() {
-        calculatedResources = {"lmd": 0, "exp": 0};
-      });
-      return;
-    }
-    setState(() {
-      calculatedResources["lmd"] =
-          (endElite - startElite) * 1000 + (endLevel - startLevel) * 50;
-      calculatedResources["exp"] =
-          (endElite - startElite) * 2000 + (endLevel - startLevel) * 100;
-    });
-  }
+  late TextEditingController startLevelController;
+  late TextEditingController endLevelController;
 
   @override
   void initState() {
     super.initState();
-    resourceCalculator();
+    startLevelController = TextEditingController(text: startLevel.toString());
+    endLevelController = TextEditingController(text: endLevel.toString());
+    _loadJsonData();
+  }
+
+  @override
+  void dispose() {
+    startLevelController.dispose();
+    endLevelController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadJsonData() async {
+    try {
+      String costData =
+          await rootBundle.loadString('assets/data/explmdcost.json');
+      setState(() {
+        costDataObj = json.decode(costData);
+        print(json.encode(
+            costDataObj?["maxlvl"]?[selectedRarity - 1]?[startElite] is int));
+      });
+    } catch (e) {
+      print("Error loading JSON data: $e");
+    }
+  }
+
+  void inputValidifier() {
+    print("validifier called");
+
+    FocusScope.of(context).unfocus();
+
+    int getJsonInt(dynamic value) {
+      if (value == null) return 1;
+      if (value is int) return value;
+      if (value is num) return value.toInt();
+      return 1;
+    }
+
+    int newStartLevel = int.tryParse(startLevelController.text) ?? startLevel;
+    int newEndLevel = int.tryParse(endLevelController.text) ?? endLevel;
+
+    final startMaxLevel =
+        getJsonInt(costDataObj?["maxlvl"][selectedRarity - 1][startElite]);
+    final endMaxLevel =
+        getJsonInt(costDataObj?["maxlvl"][selectedRarity - 1][endElite]);
+
+    setState(() {
+      if (newStartLevel < 1) {
+        newStartLevel = 1;
+      } else if (newStartLevel > startMaxLevel) {
+        newStartLevel = startMaxLevel;
+      }
+
+      if (newEndLevel < 1) {
+        newEndLevel = 1;
+      } else if (newEndLevel > endMaxLevel) {
+        newEndLevel = endMaxLevel;
+      }
+
+      if (startElite > endElite) {
+        endElite = startElite;
+      }
+
+      if (startElite == endElite && startLevel > endLevel) {
+        newEndLevel = newStartLevel;
+      }
+
+      startLevel = newStartLevel;
+      endLevel = newEndLevel;
+
+      startLevelController.text = startLevel.toString();
+      endLevelController.text = endLevel.toString();
+
+      resourceCalculator();
+    });
+  }
+
+  void resourceCalculator() {
+    final int rarity = selectedRarity;
+    int lmd = 0;
+    int exp = 0;
+    int curElite = startElite;
+    int curLevel = startLevel;
+
+    try {
+      int getJsonInt(dynamic value) {
+        if (value == null) return 0;
+        if (value is int) return value;
+        if (value is num) return value.toInt();
+        return 0;
+      }
+
+      while (curElite < endElite) {
+        final maxLevel =
+            getJsonInt(costDataObj?["maxlvl"][rarity - 1][curElite]);
+
+        if (curLevel >= maxLevel) {
+          final promotionCost =
+              getJsonInt(costDataObj?["promotionCost"][rarity - 1][curElite]);
+          lmd += promotionCost;
+          curElite += 1;
+          curLevel = 1;
+        } else {
+          final expCost =
+              getJsonInt(costDataObj?["expCost"][curElite][curLevel - 1]);
+          final lmdCost =
+              getJsonInt(costDataObj?["lmdCost"][curElite][curLevel - 1]);
+          exp += expCost;
+          lmd += lmdCost;
+          curLevel++;
+        }
+      }
+
+      while (curLevel < endLevel) {
+        final expCost =
+            getJsonInt(costDataObj?["expCost"][curElite][curLevel - 1]);
+        final lmdCost =
+            getJsonInt(costDataObj?["lmdCost"][curElite][curLevel - 1]);
+        exp += expCost;
+        lmd += lmdCost;
+        curLevel++;
+      }
+
+      setState(() {
+        calculatedResources["lmd"] = lmd;
+        calculatedResources["exp"] = exp;
+      });
+    } catch (error) {
+      print("Error during calculation: $error");
+      setState(() {
+        calculatedResources["lmd"] = 0;
+        calculatedResources["exp"] = 0;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: ColorFab.offWhite,
-      appBar: AppBar(
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+      },
+      child: Scaffold(
         backgroundColor: ColorFab.offWhite,
-        title: const Text("Resource Estimator"),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(10.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 10),
-            Text("Choose Operator Rarity", style: const TextStyle(fontSize: 16)),
-            _buildDropdown(rarities, selectedRarity,
-                (value) {
-              selectedRarity = value;
-              resourceCalculator();
-            }),
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildEliteLevelInfo(
-                    "Starting Stats",
-                    startElite,
-                    startLevel,
-                    (elite, level) {
-                      startElite = elite;
-                      startLevel = level;
-                      resourceCalculator();
-                    },
-                  ),
-                ),
-                const SizedBox(width: 20),
-                Expanded(
-                  child: _buildEliteLevelInfo(
-                    "Ending Stats",
-                    endElite,
-                    endLevel,
-                    (elite, level) {
-                      endElite = elite;
-                      endLevel = level;
-                      resourceCalculator();
-                    },
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              "Required Resources",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 10),
-            _buildResourceDisplay(),
-          ],
+        appBar: AppBar(
+          backgroundColor: ColorFab.offWhite,
+          title: const Text("Resource Estimator"),
         ),
+        body: costDataObj == null
+            ? Center(child: CircularProgressIndicator())
+            : SingleChildScrollView(
+                padding: const EdgeInsets.all(10.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 10),
+                    Text("Choose Operator Rarity",
+                        style: const TextStyle(fontSize: 16)),
+                    _buildDropdown(rarities, selectedRarity, (value) {
+                      setState(() {
+                        selectedRarity = value;
+                      });
+                      inputValidifier();
+                    }),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildEliteLevelInfo(
+                            "Starting Stats",
+                            startElite,
+                            startLevel,
+                            (elite, level) {
+                              setState(() {
+                                startElite = elite;
+                                startLevel = level;
+                              });
+                            },
+                            startLevelController,
+                          ),
+                        ),
+                        Container(
+                            alignment: Alignment.center,
+                            child: Icon(
+                              Icons.double_arrow,
+                              size: 30.0,
+                            )),
+                        Expanded(
+                          child: _buildEliteLevelInfo(
+                            "Ending Stats",
+                            endElite,
+                            endLevel,
+                            (elite, level) {
+                              setState(() {
+                                endElite = elite;
+                                endLevel = level;
+                              });
+                            },
+                            endLevelController,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    const Text(
+                      "Required Resources",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    _buildResourceDisplay(),
+                  ],
+                ),
+              ),
       ),
     );
   }
 
-  Widget _buildDropdown(List<Map<String, dynamic>> items,
-      int value, Function(int) onChanged) {
+  Widget _buildDropdown(
+      List<Map<String, dynamic>> items, int value, Function(int) onChanged) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -141,10 +283,8 @@ class _LevelCostCalcState extends State<LevelCostCalc> {
             value: value,
             onChanged: (selectedValue) {
               if (selectedValue != value) {
-                setState(() {
-                  onChanged(selectedValue!); 
-                });
-                resourceCalculator(); 
+                onChanged(selectedValue!);
+                inputValidifier();
               }
             },
             dropdownStyleData: DropdownStyleData(
@@ -167,8 +307,12 @@ class _LevelCostCalcState extends State<LevelCostCalc> {
     );
   }
 
-  Widget _buildEliteLevelInfo(String label, int elite, int level,
-      Function(int elite, int level) onChanged) {
+  Widget _buildEliteLevelInfo(
+      String label,
+      int elite,
+      int level,
+      Function(int elite, int level) onChanged,
+      TextEditingController controller) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -178,20 +322,28 @@ class _LevelCostCalcState extends State<LevelCostCalc> {
           child: Column(
             children: [
               _buildDropdown(elites, elite, (value) {
-                  onChanged(value, level);
-                }),
+                onChanged(value, level);
+                inputValidifier();
+              }),
               const SizedBox(height: 8),
               TextField(
-                  decoration: const InputDecoration(
-                    labelText: "Level",
-                    border: OutlineInputBorder(),
-                  ),
-                  keyboardType: TextInputType.number,
-                  onChanged: (value) {
-                    onChanged(elite, int.tryParse(value) ?? level);
-                  },
+                controller: controller,
+                decoration: const InputDecoration(
+                  labelText: "Level",
+                  border: OutlineInputBorder(),
                 ),
-            
+                keyboardType: TextInputType.number,
+                onChanged: (value) {
+                  final newLevel = int.tryParse(value) ?? level;
+                  onChanged(elite, newLevel);
+                },
+                onSubmitted: (value) {
+                  inputValidifier();
+                },
+                // Remove onEditingComplete since it's redundant with onSubmitted
+                textInputAction:
+                    TextInputAction.done, // Explicitly set the keyboard action
+              ),
             ],
           ),
         ),
