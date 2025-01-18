@@ -20,14 +20,14 @@ class Trait extends StatelessWidget {
             'Trait',
             style: TextStyle(
               fontSize: 18,
-              color: ColorFab.midAccent,
+              color: Theme.of(context).colorScheme.inverseSurface,
             ),
           ),
           Text(
             description,
             style: TextStyle(
               fontSize: 15,
-              color: ColorFab.darkAccent,
+              color: Theme.of(context).colorScheme.inverseSurface,
             ),
           ),
         ],

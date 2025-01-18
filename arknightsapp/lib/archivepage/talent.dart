@@ -16,7 +16,7 @@ class Talent extends StatelessWidget {
             'Talents',
             style: TextStyle(
               fontSize: 18,
-              color: ColorFab.midAccent,
+              color: Theme.of(context).colorScheme.inverseSurface,
             ),
           ),
           SizedBox(height: 3,),
@@ -30,7 +30,7 @@ class Talent extends StatelessWidget {
                     Text(
                       talent['candidates'][0]['name'] ?? 'Unnamed Talent',
                       style: TextStyle(
-                        color: ColorFab.midAccent, 
+                        color: Theme.of(context).colorScheme.inverseSurface, 
                         fontWeight: FontWeight.bold,
                         fontSize: 15,
                       ),
@@ -38,7 +38,7 @@ class Talent extends StatelessWidget {
                     Text(
                       talent['candidates'][0]['description'] ?? 'No description available',
                       style: TextStyle(
-                        color: ColorFab.offBlack, 
+                        color: Theme.of(context).colorScheme.inverseSurface, 
                       ),
                     ),
                   ],

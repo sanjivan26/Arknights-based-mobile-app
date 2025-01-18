@@ -15,7 +15,7 @@ class OperatorDetails extends StatelessWidget {
     return Theme(
       data: ThemeData(
         dividerTheme: DividerThemeData(
-          color: ColorFab.darkAccent,
+          color: Theme.of(context).colorScheme.inverseSurface,
           thickness: 1,
           indent: 20,
           endIndent: 20,
@@ -23,11 +23,11 @@ class OperatorDetails extends StatelessWidget {
       ),
       child: Scaffold(
         appBar: AppBar(
-          title: Text(operator['name'] ?? 'Operator Details'),
-          backgroundColor: ColorFab.offWhite,
+          title: Text(operator['name'] ?? 'Operator Details', style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface),),
+          backgroundColor: Theme.of(context).colorScheme.surface,
         ),
         body: Container(
-          color: ColorFab.offWhite,
+          color: Theme.of(context).colorScheme.surface,
           child: ListView.separated(
             separatorBuilder: (context, index) => Divider(),
             itemCount: 4,
