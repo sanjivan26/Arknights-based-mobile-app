@@ -148,43 +148,30 @@ class _RecruitSimState extends State<RecruitSim> {
     return result;
   }
 
-  List<List<String>> _sortCombinations(List<String> list) {
-    if (list.isEmpty) return [];
-
-    List<List<String>> result = [];
-    int n = list.length;
-
-    for (int size = 1; size <= math.min(3, n); size++) {
-      for (int i = 0; i < (1 << n); i++) {
-        int bits = i.toRadixString(2).split('1').length - 1;
-        if (bits != size) continue;
-
-        List<String> combination = [];
-        for (int j = 0; j < n; j++) {
-          if ((i & (1 << j)) != 0) {
-            combination.add(list[j]);
-          }
-        }
-        result.add(combination);
-      }
-    }
-    return result;
-  }
-
-
-
   void _updateResults() {
     if (_recruitsData == null) return;
 
     final List<String> tagsList = selectedTags.toList()..sort();
     final combinations = _getCombinations(tagsList);
+    final keyList = combinations
+        .where(
+            (combination) => _recruitsData!.containsKey(combination.join(',')))
+        .map((e) => e.join(','));
+    ;
+    final List<String> sortedKeyList = keyList.toList()
+  ..sort((a, b) {
+    final guaranteesA = (_recruitsData![a]["guarantees"] as List).isEmpty
+        ? 0
+        : (_recruitsData![a]["guarantees"] as List).first;
+    final guaranteesB = (_recruitsData![b]["guarantees"] as List).isEmpty
+        ? 0
+        : (_recruitsData![b]["guarantees"] as List).first;
+    return guaranteesB.compareTo(guaranteesA);
+  });
+
 
     setState(() {
-      _currentResults = combinations
-          .where((combination) =>
-              _recruitsData!.containsKey(combination.join(',')))
-          .map((combination) {
-        final combinationKey = combination.join(',');
+      _currentResults = sortedKeyList.map((combinationKey) {
         final recruitsList =
             _recruitsData![combinationKey]['operators'] as List;
         return {
