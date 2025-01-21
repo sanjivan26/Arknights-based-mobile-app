@@ -6,7 +6,6 @@ class ThemeProvider with ChangeNotifier {
 
   ThemeData get themedata => _themedata;
 
-  // Renamed setter to setTheme to avoid conflict
   void setTheme(ThemeData themedata) {
     _themedata = themedata;
     notifyListeners();

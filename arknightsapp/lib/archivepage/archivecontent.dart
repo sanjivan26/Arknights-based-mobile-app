@@ -163,7 +163,7 @@ class _ArchiveContentState extends State<ArchiveContent> {
                 MultiSelectDialogField<String>(
                   selectedItemsTextStyle: TextStyle(color: Theme.of(context).colorScheme.inverseSurface),
                   selectedColor: Theme.of(context).colorScheme.inverseSurface,
-                  backgroundColor: Theme.of(context).colorScheme.onSurface,
+                  backgroundColor: Theme.of(context).colorScheme.onTertiary,
                   checkColor: Theme.of(context).colorScheme.surfaceContainer,
 
                   items: [
@@ -212,8 +212,8 @@ class _ArchiveContentState extends State<ArchiveContent> {
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
                             color: _selectedRarities.contains(rarity + 1)
-                                ? Theme.of(context).colorScheme.onSurfaceVariant
-                                : Theme.of(context).colorScheme.onSurface,
+                                ? Theme.of(context).colorScheme.onSecondary
+                                : Theme.of(context).colorScheme.onTertiary,
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Text(

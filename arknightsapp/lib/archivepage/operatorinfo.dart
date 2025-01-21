@@ -69,54 +69,54 @@ class _OperatorInfoState extends State<OperatorInfo> {
           double screenWidth = MediaQuery.of(context).size.width;
           double imageSize = screenWidth * 0.20;
 
-          return Container(
-            margin: const EdgeInsets.all(5.0),
-            decoration: BoxDecoration(
-              color: ColorFab.lightShadow,
-              borderRadius:
-                  BorderRadius.circular(5),
-            ),
-            padding: const EdgeInsets.all(20),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Container(
-                  width: imageSize,
-                  height: imageSize,
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: ColorFab.darkAccent,
-                      width: 2,
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surfaceTint,
+                borderRadius: BorderRadius.circular(5),
+              ),
+              padding: const EdgeInsets.all(20),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Align(
+                    alignment: Alignment.center,
+                    child: Container(
+                      width: imageSize,
+                      height: imageSize,
+                      decoration: BoxDecoration(
+                        color: Color(0xFFD3D3D3),
+                        border: Border.all(
+                          color: Theme.of(context).colorScheme.inverseSurface,
+                          width: 2,
+                        ),
+                        borderRadius: BorderRadius.circular(75),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(75),
+                        child: Image.asset(
+                          imagePath,
+                          width: 100,
+                          height: 100,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
                     ),
-                    borderRadius: BorderRadius.circular(75),
                   ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(75),
-                    child: Image.asset(
-                      imagePath,
-                      width: 100,
-                      height: 100,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 25),
-                Container(
-                  constraints: BoxConstraints(minHeight: 40, maxHeight: 90),
-                  child: Column(
+                  const SizedBox(width: 25),
+                  Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Expanded(
-                        child: Text(
-                          widget.operator['name'] ?? 'Unknown Operator',
-                          style: TextStyle(
-                            color: ColorFab.darkAccent,
-                            fontSize: 18,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                      Text(
+                        widget.operator['name'] ?? 'Unknown Operator',
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.inverseSurface,
+                          fontSize: 18,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                       Row(
                         children: List.generate(
@@ -124,23 +124,25 @@ class _OperatorInfoState extends State<OperatorInfo> {
                           (index) => Icon(
                             Icons.star,
                             size: 22,
-                            color: ColorFab.darkAccent,
+                            color: Theme.of(context).colorScheme.inverseSurface,
                           ),
                         ),
                       ),
                       const SizedBox(height: 3),
                       Text(
                         classMapping[widget.operator['profession']] ?? '',
-                        style: TextStyle(fontSize: 15, color: ColorFab.darkAccent),
+                        style: TextStyle(
+                            fontSize: 15, color: Theme.of(context).colorScheme.onSurface),
                       ),
                       Text(
                         factionName,
-                        style: TextStyle(fontSize: 15, color: ColorFab.darkAccent),
+                        style: TextStyle(
+                            fontSize: 15, color: Theme.of(context).colorScheme.onSurface),
                       ),
                     ],
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           );
         } else {

@@ -152,7 +152,7 @@ class _RecruitSimState extends State<RecruitSim> {
                 padding:
                     const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                 decoration: BoxDecoration(
-                  color: isSelected ? Theme.of(context).colorScheme.onSurfaceVariant : Theme.of(context).colorScheme.onSurface,
+                  color: isSelected ? Theme.of(context).colorScheme.onSecondary : Theme.of(context).colorScheme.onTertiary,
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
                     color: isSelected ? ColorFab.grey : ColorFab.midAccent,
@@ -160,7 +160,7 @@ class _RecruitSimState extends State<RecruitSim> {
                 ),
                 child: Text(
                   tag,
-                  style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface),
+                  style: TextStyle(color: Color(0xFF181818)),
                 ),
               ),
             );

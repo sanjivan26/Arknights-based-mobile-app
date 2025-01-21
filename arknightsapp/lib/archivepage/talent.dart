@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import './../colorfab.dart'; 
 class Talent extends StatelessWidget {
   final dynamic operator; 
 
@@ -16,10 +15,10 @@ class Talent extends StatelessWidget {
             'Talents',
             style: TextStyle(
               fontSize: 18,
-              color: Theme.of(context).colorScheme.inverseSurface,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
-          SizedBox(height: 3,),
+          SizedBox(height: 3),
           if (operator['talents'] != null && operator['talents'].isNotEmpty)
             ...operator['talents'].map<Widget>((talent) {
               return Padding(
@@ -38,7 +37,7 @@ class Talent extends StatelessWidget {
                     Text(
                       talent['candidates'][0]['description'] ?? 'No description available',
                       style: TextStyle(
-                        color: Theme.of(context).colorScheme.inverseSurface, 
+                        color: Theme.of(context).colorScheme.onSurface, 
                       ),
                     ),
                   ],

@@ -1,4 +1,3 @@
-import './../colorfab.dart';
 import 'package:flutter/material.dart';
 import './operatorinfo.dart';
 import './trait.dart';
@@ -13,7 +12,7 @@ class OperatorDetails extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Theme(
-      data: ThemeData(
+      data: Theme.of(context).copyWith(
         dividerTheme: DividerThemeData(
           color: Theme.of(context).colorScheme.inverseSurface,
           thickness: 1,
@@ -23,7 +22,11 @@ class OperatorDetails extends StatelessWidget {
       ),
       child: Scaffold(
         appBar: AppBar(
-          title: Text(operator['name'] ?? 'Operator Details', style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface),),
+          title: Text(
+            operator['name'] ?? 'Operator Details',
+            style:
+                TextStyle(color: Theme.of(context).colorScheme.inverseSurface),
+          ),
           backgroundColor: Theme.of(context).colorScheme.surface,
         ),
         body: Container(
@@ -42,7 +45,7 @@ class OperatorDetails extends StatelessWidget {
                 case 3:
                   return Talent(operator: operator);
                 default:
-                  return SizedBox.shrink(); 
+                  return SizedBox.shrink();
               }
             },
           ),
