@@ -70,8 +70,6 @@ class _LevelCostCalcState extends State<LevelCostCalc> {
   }
 
   void inputValidifier() {
-    print("validifier called");
-
     FocusScope.of(context).unfocus();
 
     int getJsonInt(dynamic value) {

@@ -3,6 +3,23 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:math' as math;
 import '../../../colorfab.dart';
+import './../../archivepage/operatortile.dart';
+
+class JsonCache {
+  static final Map<String, String> _cache = {};
+
+  static String? get(String key) {
+    return _cache[key];
+  }
+
+  static void set(String key, String jsonString) {
+    _cache[key] = jsonString;
+  }
+
+  static void clear() {
+    _cache.clear();
+  }
+}
 
 class RecruitSim extends StatefulWidget {
   const RecruitSim({super.key});
@@ -12,6 +29,9 @@ class RecruitSim extends StatefulWidget {
 }
 
 class _RecruitSimState extends State<RecruitSim> {
+  late Future<Map<String, dynamic>> _operatorsFuture;
+  bool _isLoading = false;
+
   final Map<String, List<String>> tags = {
     "Rarity": ["Top Operator", "Senior Operator", "Starter", "Robot"],
     "Position": ["Melee", "Ranged"],
@@ -52,6 +72,33 @@ class _RecruitSimState extends State<RecruitSim> {
   void initState() {
     super.initState();
     _recruitsFuture = fetchRecruits();
+    _operatorsFuture = fetchOperators();
+  }
+
+  Future<Map<String, dynamic>> fetchOperators() async {
+    setState(() => _isLoading = true);
+    try {
+      var cachedData = JsonCache.get('operatorData');
+
+      if (cachedData != null) {
+        final parsedData = json.decode(cachedData) as Map<String, dynamic>;
+        return parsedData;
+      }
+
+      final url = Uri.parse(
+          'https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/en_US/gamedata/excel/character_table.json');
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        JsonCache.set('operatorData', response.body);
+        final parsedData = json.decode(response.body) as Map<String, dynamic>;
+        return parsedData;
+      } else {
+        throw Exception('Failed to load operators');
+      }
+    } finally {
+      setState(() => _isLoading = false);
+    }
   }
 
   Future<Map<String, dynamic>> fetchRecruits() async {
@@ -101,31 +148,51 @@ class _RecruitSimState extends State<RecruitSim> {
     return result;
   }
 
+  List<List<String>> _sortCombinations(List<String> list) {
+    if (list.isEmpty) return [];
+
+    List<List<String>> result = [];
+    int n = list.length;
+
+    for (int size = 1; size <= math.min(3, n); size++) {
+      for (int i = 0; i < (1 << n); i++) {
+        int bits = i.toRadixString(2).split('1').length - 1;
+        if (bits != size) continue;
+
+        List<String> combination = [];
+        for (int j = 0; j < n; j++) {
+          if ((i & (1 << j)) != 0) {
+            combination.add(list[j]);
+          }
+        }
+        result.add(combination);
+      }
+    }
+    return result;
+  }
+
+
+
   void _updateResults() {
     if (_recruitsData == null) return;
 
     final List<String> tagsList = selectedTags.toList()..sort();
     final combinations = _getCombinations(tagsList);
 
-    List<Map<String, dynamic>> newResults = [];
-
-    for (var combination in combinations) {
-      final combinationKey = combination.join(',');
-      if (_recruitsData!.containsKey(combinationKey)) {
+    setState(() {
+      _currentResults = combinations
+          .where((combination) =>
+              _recruitsData!.containsKey(combination.join(',')))
+          .map((combination) {
+        final combinationKey = combination.join(',');
         final recruitsList =
             _recruitsData![combinationKey]['operators'] as List;
-        if (recruitsList.isNotEmpty) {
-          newResults.add({
-            'key': combinationKey,
-            'recruitIds':
-                recruitsList.map<String>((r) => r['id'] as String).toList(),
-          });
-        }
-      }
-    }
-
-    setState(() {
-      _currentResults = newResults;
+        return {
+          'key': combinationKey,
+          'recruitIds':
+              recruitsList.map<String>((r) => r['id'] as String).toList(),
+        };
+      }).toList();
     });
   }
 
@@ -152,7 +219,9 @@ class _RecruitSimState extends State<RecruitSim> {
                 padding:
                     const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                 decoration: BoxDecoration(
-                  color: isSelected ? Theme.of(context).colorScheme.onSecondary : Theme.of(context).colorScheme.onTertiary,
+                  color: isSelected
+                      ? Theme.of(context).colorScheme.onSecondary
+                      : Theme.of(context).colorScheme.onTertiary,
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
                     color: isSelected ? ColorFab.grey : ColorFab.midAccent,
@@ -174,14 +243,18 @@ class _RecruitSimState extends State<RecruitSim> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Recruit Simulator", style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface),),
+        title: Text(
+          "Recruit Simulator",
+          style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface),
+        ),
         backgroundColor: Theme.of(context).colorScheme.surface,
       ),
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: FutureBuilder<Map<String, dynamic>>(
         future: _recruitsFuture,
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
+          if (snapshot.connectionState == ConnectionState.waiting ||
+              _isLoading) {
             return const Center(child: CircularProgressIndicator());
           }
 
@@ -205,8 +278,8 @@ class _RecruitSimState extends State<RecruitSim> {
                           });
                         },
                         style: ButtonStyle(
-                          backgroundColor:
-                              WidgetStateProperty.all(Theme.of(context).colorScheme.onError),
+                          backgroundColor: WidgetStateProperty.all(
+                              Theme.of(context).colorScheme.onError),
                           foregroundColor:
                               WidgetStateProperty.all(ColorFab.offWhite),
                         ),
@@ -253,19 +326,50 @@ class _RecruitSimState extends State<RecruitSim> {
                           Text(
                             combinationKey,
                             style: TextStyle(
-                              color: Theme.of(context).colorScheme.inverseSurface,
+                              color:
+                                  Theme.of(context).colorScheme.inverseSurface,
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           const SizedBox(height: 4),
-                          ...recruitIds.map((id) => Text(
-                                id,
-                                style: TextStyle(
-                                  color: Theme.of(context).colorScheme.inverseSurface,
-                                  fontSize: 12,
+                          FutureBuilder<Map<String, dynamic>>(
+                            future: _operatorsFuture,
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return const CircularProgressIndicator();
+                              }
+                              if (snapshot.hasError) {
+                                return Text('Error loading operators');
+                              }
+                              final operatorsData = snapshot.data!;
+                              return GridView.builder(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                gridDelegate:
+                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 4,
+                                  crossAxisSpacing: 3,
+                                  mainAxisSpacing: 3,
+                                  childAspectRatio: 0.825,
                                 ),
-                              )),
+                                itemCount: recruitIds.length,
+                                itemBuilder: (context, gridIndex) {
+                                  final operatorName =
+                                      operatorsData[recruitIds[gridIndex]]
+                                              ?["name"] ??
+                                          'Name Unknown';
+                                  return RepaintBoundary(
+                                    child: OperatorTile(
+                                      operatorsData[recruitIds[gridIndex]],
+                                      key: ValueKey('operator_$operatorName'),
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                          ),
                         ],
                       ),
                     );

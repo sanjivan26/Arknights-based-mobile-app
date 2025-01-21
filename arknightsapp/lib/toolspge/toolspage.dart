@@ -10,13 +10,18 @@ class ToolsPage extends StatelessWidget {
     double boxHeight = MediaQuery.of(context).size.height * 0.15;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Tools", style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface),),
+      appBar: AppBar( 
+        title: Text(
+          "Tools",
+          style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface),
+        ),
         backgroundColor: Theme.of(context).colorScheme.surface,
       ),
       body: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10.0),
-        decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface,),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
