@@ -1,3 +1,4 @@
+import 'package:arknightsapp/theme/raritycode.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -159,16 +160,15 @@ class _RecruitSimState extends State<RecruitSim> {
         .map((e) => e.join(','));
     ;
     final List<String> sortedKeyList = keyList.toList()
-  ..sort((a, b) {
-    final guaranteesA = (_recruitsData![a]["guarantees"] as List).isEmpty
-        ? 0
-        : (_recruitsData![a]["guarantees"] as List).first;
-    final guaranteesB = (_recruitsData![b]["guarantees"] as List).isEmpty
-        ? 0
-        : (_recruitsData![b]["guarantees"] as List).first;
-    return guaranteesB.compareTo(guaranteesA);
-  });
-
+      ..sort((a, b) {
+        final guaranteesA = (_recruitsData![a]["guarantees"] as List).isEmpty
+            ? 0
+            : (_recruitsData![a]["guarantees"] as List).first;
+        final guaranteesB = (_recruitsData![b]["guarantees"] as List).isEmpty
+            ? 0
+            : (_recruitsData![b]["guarantees"] as List).first;
+        return guaranteesB.compareTo(guaranteesA);
+      });
 
     setState(() {
       _currentResults = sortedKeyList.map((combinationKey) {
@@ -303,6 +303,10 @@ class _RecruitSimState extends State<RecruitSim> {
                     final result = _currentResults[index];
                     final combinationKey = result['key'] as String;
                     final recruitIds = result['recruitIds'] as List<String>;
+                    final confirmedRarity =
+                        _recruitsData![combinationKey]["guarantees"].isEmpty
+                            ? 0
+                            : _recruitsData![combinationKey]["guarantees"][0];
 
                     return Padding(
                       padding: const EdgeInsets.symmetric(
@@ -310,14 +314,49 @@ class _RecruitSimState extends State<RecruitSim> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            combinationKey,
-                            style: TextStyle(
-                              color:
-                                  Theme.of(context).colorScheme.inverseSurface,
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                            ),
+                          Row(
+                            children: [
+                              const SizedBox(width: 5),
+                              if(confirmedRarity!=0)
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 5, vertical: 1),
+                                  decoration: BoxDecoration(
+                                    color: rarityCode(confirmedRarity),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        confirmedRarity == 0
+                                            ? ''
+                                            : confirmedRarity.toString(),
+                                        style: TextStyle(
+                                          color: Color(0xFF181818),
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      Icon(
+                                        Icons.star,
+                                        size: 14,
+                                        color: Color(0xFF181818),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              const SizedBox(width: 5),
+                              Text(
+                                combinationKey,
+                                style: TextStyle(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .inverseSurface,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
                           ),
                           const SizedBox(height: 4),
                           FutureBuilder<Map<String, dynamic>>(
