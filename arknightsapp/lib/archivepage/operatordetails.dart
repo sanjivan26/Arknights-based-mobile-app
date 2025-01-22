@@ -11,6 +11,7 @@ class OperatorDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double screenHeight = MediaQuery.of(context).size.height;
     return Theme(
       data: Theme.of(context).copyWith(
         dividerTheme: DividerThemeData(
@@ -41,7 +42,7 @@ class OperatorDetails extends StatelessWidget {
                 case 1:
                   return Trait(operator: operator);
                 case 2:
-                  return Skills(operator: operator);
+                  return Skills(operator: operator, screenHeight: screenHeight,);
                 case 3:
                   return Talent(operator: operator);
                 default:

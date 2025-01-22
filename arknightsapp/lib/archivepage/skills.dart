@@ -4,13 +4,16 @@ import 'dart:convert';
 
 class Skills extends StatefulWidget {
   final dynamic operator;
-  const Skills({super.key, required this.operator});
+  final double screenHeight;
+  const Skills({super.key, required this.operator, required this.screenHeight});
 
   @override
   State<Skills> createState() => _SkillsState();
 }
 
 class _SkillsState extends State<Skills> {
+  int skillLevel = 0;
+  RangeValues _currentRange = const RangeValues(0,9);
   late Future<Map<String, dynamic>> _skillsFuture;
   String skillName = "";
   String skillDescription = "";
@@ -23,7 +26,7 @@ class _SkillsState extends State<Skills> {
 
     final operatorSkills = widget.operator['skills'] ?? [];
     if (operatorSkills.isNotEmpty) {
-      final defaultSkillId = operatorSkills[0]['skillId'];
+      final defaultSkillId = operatorSkills[skillLevel+1]['skillId'];
       _loadSkillData(defaultSkillId);
     } else {
       skillName = "This character doesn't have skills.";
@@ -36,10 +39,10 @@ class _SkillsState extends State<Skills> {
       final skillData = skills[skillId];
       if (skillData != null) {
         setState(() {
-          skillName = skillData['levels'][0]['name'] ?? '';
+          skillName = skillData['levels'][skillLevel+1]['name'] ?? '';
           skillDescription = replaceDescription(
-            skillData['levels'][0]['description'] ?? '',
-            skillData['levels'][0]['blackboard'] ?? [],
+            skillData['levels'][skillLevel+1]['description'] ?? '',
+            skillData['levels'][skillLevel+1]['blackboard'] ?? [],
           );
         });
       }
@@ -103,145 +106,209 @@ class _SkillsState extends State<Skills> {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: Container(
+                height: widget.screenHeight * 0.30,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(5),
                 ),
                 padding: const EdgeInsets.all(20),
-                child: Row(
+                child: Column(
                   children: [
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    Row(
                       children: [
-                        if (rarity > 2)
-                          Align(
-                              alignment: Alignment.topLeft,
-                              child: Text(
-                                "Skills",
-                                style: TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurface),
-                              )),
-                        if (rarity > 2)
-                          ElevatedButton(
-                            style: ButtonStyle(
-                              backgroundColor: selected == 1
-                                  ? WidgetStateProperty.all(Theme.of(context).colorScheme.onSecondary)
-                                  : WidgetStateProperty.all(
-                                      Theme.of(context).colorScheme.onTertiary),
-                            ),
-                            onPressed: () {
-                              final skillData =
-                                  skills[operatorSkills[0]['skillId']];
-                              if (skillData != null) {
-                                setState(() {
-                                  skillName =
-                                      skillData['levels'][0]['name'] ?? '';
-                                  skillDescription = replaceDescription(
-                                    skillData['levels'][0]['description'] ?? '',
-                                    skillData['levels'][0]['blackboard'] ?? [],
-                                  );
-                                  selected = 1;
-                                });
-                              }
-                            },
-                            child: const Text(
-                              '1',
-                              style: TextStyle(color: Colors.black),
-                            ),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            if (rarity > 2)
+                              Align(
+                                  alignment: Alignment.topLeft,
+                                  child: Text(
+                                    "Skills",
+                                    style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface),
+                                  )),
+                            if (rarity > 2)
+                              ElevatedButton(
+                                style: ButtonStyle(
+                                  backgroundColor: selected == 1
+                                      ? WidgetStateProperty.all(
+                                          Theme.of(context)
+                                              .colorScheme
+                                              .onSecondary)
+                                      : WidgetStateProperty.all(
+                                          Theme.of(context)
+                                              .colorScheme
+                                              .onTertiary),
+                                ),
+                                onPressed: () {
+                                  final skillData =
+                                      skills[operatorSkills[0]['skillId']];
+                                  if (skillData != null) {
+                                    setState(() {
+                                      skillName = skillData['levels']
+                                              [skillLevel+1]['name'] ??
+                                          '';
+                                      skillDescription = replaceDescription(
+                                        skillData['levels'][skillLevel+1]
+                                                ['description'] ??
+                                            '',
+                                        skillData['levels'][skillLevel+1]
+                                                ['blackboard'] ??
+                                            [],
+                                      );
+                                      selected = 1;
+                                    });
+                                  }
+                                },
+                                child: const Text(
+                                  '1',
+                                  style: TextStyle(color: Colors.black),
+                                ),
+                              ),
+                            if (rarity > 3)
+                              ElevatedButton(
+                                style: ButtonStyle(
+                                  backgroundColor: selected == 2
+                                      ? WidgetStateProperty.all(
+                                          Theme.of(context)
+                                              .colorScheme
+                                              .onSecondary)
+                                      : WidgetStateProperty.all(
+                                          Theme.of(context)
+                                              .colorScheme
+                                              .onTertiary),
+                                ),
+                                onPressed: () {
+                                  final skillData =
+                                      skills[operatorSkills[1]['skillId']];
+                                  if (skillData != null) {
+                                    setState(() {
+                                      skillName = skillData['levels']
+                                              [skillLevel+1]['name'] ??
+                                          '';
+                                      skillDescription = replaceDescription(
+                                        skillData['levels'][skillLevel+1]
+                                                ['description'] ??
+                                            '',
+                                        skillData['levels'][skillLevel+1]
+                                                ['blackboard'] ??
+                                            [],
+                                      );
+                                      selected = 2;
+                                    });
+                                  }
+                                },
+                                child: const Text(
+                                  '2',
+                                  style: TextStyle(color: Colors.black),
+                                ),
+                              ),
+                            if (rarity > 5)
+                              ElevatedButton(
+                                style: ButtonStyle(
+                                  backgroundColor: selected == 3
+                                      ? WidgetStateProperty.all(
+                                          Theme.of(context)
+                                              .colorScheme
+                                              .onSecondary)
+                                      : WidgetStateProperty.all(
+                                          Theme.of(context)
+                                              .colorScheme
+                                              .onTertiary),
+                                ),
+                                onPressed: () {
+                                  final skillData =
+                                      skills[operatorSkills[2]['skillId']];
+                                  if (skillData != null) {
+                                    setState(() {
+                                      skillName = skillData['levels']
+                                              [skillLevel+1]['name'] ??
+                                          '';
+                                      skillDescription = replaceDescription(
+                                        skillData['levels'][skillLevel+1]
+                                                ['description'] ??
+                                            '',
+                                        skillData['levels'][skillLevel+1]
+                                                ['blackboard'] ??
+                                            [],
+                                      );
+                                      selected = 3;
+                                    });
+                                  }
+                                },
+                                child: const Text(
+                                  '3',
+                                  style: TextStyle(color: Colors.black),
+                                ),
+                              ),
+                          ],
+                        ),
+                        const SizedBox(width: 15),
+                        Expanded(
+                          child: Column(
+                            children: [
+                              Align(
+                                alignment: Alignment.center,
+                                child: Text(
+                                  skillName,
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface),
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              Expanded(
+                                child: SingleChildScrollView(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
+                                      skillDescription.isNotEmpty
+                                          ? skillDescription
+                                          : "No skill description available.",
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                        if (rarity > 3)
-                          ElevatedButton(
-                            style: ButtonStyle(
-                              backgroundColor: selected == 2
-                                  ? WidgetStateProperty.all(Theme.of(context).colorScheme.onSecondary)
-                                  : WidgetStateProperty.all(
-                                      Theme.of(context).colorScheme.onTertiary),
-                            ),
-                            onPressed: () {
-                              final skillData =
-                                  skills[operatorSkills[1]['skillId']];
-                              if (skillData != null) {
-                                setState(() {
-                                  skillName =
-                                      skillData['levels'][0]['name'] ?? '';
-                                  skillDescription = replaceDescription(
-                                    skillData['levels'][0]['description'] ?? '',
-                                    skillData['levels'][0]['blackboard'] ?? [],
-                                  );
-                                  selected = 2;
-                                });
-                              }
-                            },
-                            child: const Text(
-                              '2',
-                              style: TextStyle(color: Colors.black),
-                            ),
-                          ),
-                        if (rarity > 5)
-                          ElevatedButton(
-                            style: ButtonStyle(
-                              backgroundColor: selected == 3
-                                  ? WidgetStateProperty.all(Theme.of(context).colorScheme.onSecondary)
-                                  : WidgetStateProperty.all(
-                                      Theme.of(context).colorScheme.onTertiary),
-                            ),
-                            onPressed: () {
-                              final skillData =
-                                  skills[operatorSkills[2]['skillId']];
-                              if (skillData != null) {
-                                setState(() {
-                                  skillName =
-                                      skillData['levels'][0]['name'] ?? '';
-                                  skillDescription = replaceDescription(
-                                    skillData['levels'][0]['description'] ?? '',
-                                    skillData['levels'][0]['blackboard'] ?? [],
-                                  );
-                                  selected = 3;
-                                });
-                              }
-                            },
-                            child: const Text(
-                              '3',
-                              style: TextStyle(color: Colors.black),
-                            ),
-                          ),
+                        )
                       ],
                     ),
-                    const SizedBox(width: 15),
-                    Expanded(
-                      child: Column(
-                        children: [
-                          Align(
-                            alignment: Alignment.center,
-                            child: Text(
-                              skillName,
-                              style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color:
-                                      Theme.of(context).colorScheme.onSurface),
-                            ),
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Range: ${_currentRange.start.toStringAsFixed(1)} - ${_currentRange.end.toStringAsFixed(1)}',
+                          style: const TextStyle(fontSize: 20),
+                        ),
+                        RangeSlider(
+                          values: _currentRange,
+                          min: 0,
+                          max: 100,
+                          divisions: 10,
+                          labels: RangeLabels(
+                            _currentRange.start.toStringAsFixed(1),
+                            _currentRange.end.toStringAsFixed(1),
                           ),
-                          const SizedBox(height: 10),
-                          SingleChildScrollView(
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                skillDescription.isNotEmpty
-                                    ? skillDescription
-                                    : "No skill description available.",
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    color: Theme.of(context) 
-                                        .colorScheme
-                                        .onSurface),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
+                          activeColor: Colors.blue,
+                          inactiveColor: Colors.grey.shade300,
+                          onChanged: (RangeValues values) {
+                            setState(() {
+                              _currentRange = values;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),

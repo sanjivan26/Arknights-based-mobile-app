@@ -51,7 +51,7 @@ class ToolsPage extends StatelessWidget {
                         child: Text(
                           "Recruit Simulator",
                           style: TextStyle(
-                            color: Theme.of(context).colorScheme.inverseSurface,
+                            color: Color(0xFFF2F3F4),
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
@@ -87,7 +87,7 @@ class ToolsPage extends StatelessWidget {
                         child: Text(
                           "Resource Calculator",
                           style: TextStyle(
-                            color: Theme.of(context).colorScheme.inverseSurface,
+                            color: Color(0xFFF2F3F4),
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),

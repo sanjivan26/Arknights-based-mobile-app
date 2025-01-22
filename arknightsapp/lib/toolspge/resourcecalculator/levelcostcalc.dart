@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
-import './../../colorfab.dart';
 
 class LevelCostCalc extends StatefulWidget {
   const LevelCostCalc({super.key});
@@ -285,8 +284,7 @@ class _LevelCostCalcState extends State<LevelCostCalc> {
                         item["label"],
                         style: TextStyle(
                             fontSize: 16,
-                            color:
-                                Theme.of(context).colorScheme.inverseSurface),
+                            color:Color(0xFFF2F3F4)),
                       ),
                     ))
                 .toList(),
@@ -366,7 +364,7 @@ class _LevelCostCalcState extends State<LevelCostCalc> {
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: ColorFab.darkGrey,
+        color: Theme.of(context).colorScheme.primaryFixedDim,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Column(

@@ -7,13 +7,13 @@ Color rarityCode(int rarity) {
     case 2:
       return Color.fromARGB(255, 212, 255, 0); 
     case 3:
-      return Color.fromARGB(255, 2, 162, 255); 
+      return Color.fromARGB(255, 68, 186, 255); 
     case 4:
-      return Color.fromARGB(255, 220, 220, 220); 
+      return Color.fromARGB(255, 213, 213, 213); 
     case 5:
-      return Color.fromARGB(226, 252, 255, 186); 
+      return Color.fromARGB(255, 252, 255, 196); 
     case 6:
-      return Color.fromARGB(224, 255, 230, 0);
+      return Color.fromARGB(223, 255, 187, 0);
     default:
       return Color.fromARGB(223, 255, 255, 255);
 }

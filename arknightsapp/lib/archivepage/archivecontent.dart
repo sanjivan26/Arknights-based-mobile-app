@@ -218,7 +218,7 @@ class _ArchiveContentState extends State<ArchiveContent> {
                           ),
                           child: Text(
                             (rarity + 1).toString(),
-                            style: TextStyle(color: Theme.of(context).colorScheme.surface),
+                            style: TextStyle(color: Color(0xFFF2F3F4)),
                           ),
                         ),
                       );
@@ -240,7 +240,7 @@ class _ArchiveContentState extends State<ArchiveContent> {
                         ),
                         child: Text(
                           "Clear",
-                          style: TextStyle(color: Theme.of(context).colorScheme.surface),
+                          style: TextStyle(color: Color(0xFFF2F3F4)),
                         ),
                       ),
                     ),
