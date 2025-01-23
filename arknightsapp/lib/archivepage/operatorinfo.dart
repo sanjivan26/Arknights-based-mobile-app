@@ -1,4 +1,3 @@
-import 'package:arknightsapp/archivepage/imagemapping.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -6,7 +5,8 @@ import 'classmapping.dart';
 
 class OperatorInfo extends StatefulWidget {
   final dynamic operator;
-  const OperatorInfo({super.key, required this.operator});
+  final String opKey;
+  const OperatorInfo({super.key, required this.operator, required this.opKey});
 
   @override
   State<OperatorInfo> createState() => _OperatorInfoState();
@@ -63,8 +63,7 @@ class _OperatorInfoState extends State<OperatorInfo> {
               factions[widget.operator['teamId']]?['powerName'] ??
               'Unknown Faction';
 
-          String imagePath =
-              imageMapping[widget.operator['name']] ?? imageMapping['default']!;
+          String imagePath = 'assets/avatars/${widget.opKey}.png';
           double screenWidth = MediaQuery.of(context).size.width;
           double imageSize = screenWidth * 0.20;
 

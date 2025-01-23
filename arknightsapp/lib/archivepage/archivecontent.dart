@@ -30,8 +30,8 @@ class ArchiveContent extends StatefulWidget {
 
 class _ArchiveContentState extends State<ArchiveContent> {
   late Future<Map<String, dynamic>> _operatorsFuture;
-  List<dynamic> _allOperators = [];
-  List<dynamic> _filteredOperators = [];
+  List<Map<String, dynamic>> _allOperators = [];
+  List<Map<String, dynamic>> _filteredOperators = [];
   String _searchText = '';
   List<String> _selectedClasses = [];
   List<int> _selectedRarities = [];
@@ -51,51 +51,54 @@ class _ArchiveContentState extends State<ArchiveContent> {
   }
 
   Future<Map<String, dynamic>> fetchOperators() async {
-  setState(() => _isLoading = true);
-  try {
-    var cachedData = JsonCache.get('operatorData');
+    setState(() => _isLoading = true);
+    try {
+      var cachedData = JsonCache.get('operatorData');
 
-    if (cachedData != null) {
-      final parsedData = json.decode(cachedData) as Map<String, dynamic>;
-      await _initializeOperators(parsedData);
-      return parsedData;
+      if (cachedData != null) {
+        final parsedData = json.decode(cachedData) as Map<String, dynamic>;
+        await _initializeOperators(parsedData);
+        return parsedData;
+      }
+
+      final url = Uri.parse(
+          'https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/en_US/gamedata/excel/character_table.json');
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        JsonCache.set('operatorData', response.body);
+        final parsedData = json.decode(response.body) as Map<String, dynamic>;
+        await _initializeOperators(parsedData);
+        return parsedData;
+      } else {
+        throw Exception('Failed to load operators');
+      }
+    } finally {
+      setState(() => _isLoading = false);
     }
-
-    final url = Uri.parse(
-        'https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData_YoStar/main/en_US/gamedata/excel/character_table.json');
-    final response = await http.get(url);
-
-    if (response.statusCode == 200) {
-      JsonCache.set('operatorData', response.body);
-      final parsedData = json.decode(response.body) as Map<String, dynamic>;
-      await _initializeOperators(parsedData);
-      return parsedData;
-    } else {
-      throw Exception('Failed to load operators');
-    }
-  } finally {
-    setState(() => _isLoading = false);
   }
-}
-
 
   Future<void> _initializeOperators(Map<String, dynamic> data) async {
     _allOperators = data.entries
         .where((entry) => entry.key.startsWith('char'))
-        .map((entry) => entry.value)
+        .map((entry) => {
+              'key': entry.key,
+              'value': entry.value,
+            })
         .toList();
-    
-    _allOperators.sort((a, b) => 
-      (a['name'] as String).compareTo(b['name'] as String)
-    );
-    
+
+    _allOperators.sort((a, b) =>
+        (a['value']['name'] as String).compareTo(b['value']['name'] as String));
+
     _filteredOperators = List.from(_allOperators);
   }
 
   void filterOperators() {
     if (_isLoading) return;
 
-    if (_searchText.isEmpty && _selectedClasses.isEmpty && _selectedRarities.isEmpty) {
+    if (_searchText.isEmpty &&
+        _selectedClasses.isEmpty &&
+        _selectedRarities.isEmpty) {
       setState(() {
         _filteredOperators = List.from(_allOperators);
       });
@@ -105,19 +108,21 @@ class _ArchiveContentState extends State<ArchiveContent> {
     final searchLower = _searchText.toLowerCase();
     setState(() {
       _filteredOperators = _allOperators.where((op) {
+        final operatorValue = op['value'] as Map<String, dynamic>;
+
         if (_searchText.isNotEmpty &&
-            !op['name'].toString().toLowerCase().contains(searchLower)) {
+            !(operatorValue['name']?.toString().toLowerCase() ?? '')
+                .contains(searchLower)) {
           return false;
         }
-        
+
         if (_selectedClasses.isNotEmpty &&
-            !_selectedClasses.contains(op['profession'])) {
+            !_selectedClasses.contains(operatorValue['profession'])) {
           return false;
         }
 
         if (_selectedRarities.isNotEmpty) {
-          var rarityValue = op['rarity'];
-          int rarity = int.tryParse(rarityValue.substring(rarityValue.length - 1)) ?? 0;
+          final rarity = operatorValue['rarity'] as int? ?? 0;
           if (!_selectedRarities.contains(rarity)) {
             return false;
           }
@@ -150,8 +155,11 @@ class _ArchiveContentState extends State<ArchiveContent> {
                     prefixIcon: Icon(Icons.search),
                   ),
                   onChanged: (value) {
-                    if (_debounceTimer?.isActive ?? false) _debounceTimer!.cancel();
-                    _debounceTimer = Timer(const Duration(milliseconds: 300), () {
+                    if (_debounceTimer?.isActive ?? false) {
+                      _debounceTimer!.cancel();
+                    }
+                    _debounceTimer =
+                        Timer(const Duration(milliseconds: 300), () {
                       if (mounted) {
                         _searchText = value;
                         filterOperators();
@@ -161,11 +169,11 @@ class _ArchiveContentState extends State<ArchiveContent> {
                 ),
                 const SizedBox(height: 10),
                 MultiSelectDialogField<String>(
-                  selectedItemsTextStyle: TextStyle(color: Theme.of(context).colorScheme.inverseSurface),
+                  selectedItemsTextStyle: TextStyle(
+                      color: Theme.of(context).colorScheme.inverseSurface),
                   selectedColor: Theme.of(context).colorScheme.inverseSurface,
                   backgroundColor: Theme.of(context).colorScheme.onTertiary,
                   checkColor: Theme.of(context).colorScheme.surfaceContainer,
-
                   items: [
                     MultiSelectItem<String>('PIONEER', 'Vanguard'),
                     MultiSelectItem<String>('WARRIOR', 'Guard'),
@@ -176,9 +184,13 @@ class _ArchiveContentState extends State<ArchiveContent> {
                     MultiSelectItem<String>('SUPPORT', 'Supporter'),
                     MultiSelectItem<String>('SPECIAL', 'Specialist'),
                   ],
-                  title: Text('Select Classes',style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface)),
+                  title: Text('Select Classes',
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.inverseSurface)),
                   initialValue: _selectedClasses,
-                  buttonText: Text("Select Classes",style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface)),
+                  buttonText: Text("Select Classes",
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.inverseSurface)),
                   onConfirm: (selectedClasses) {
                     if (mounted) {
                       _selectedClasses = selectedClasses.cast<String>();
@@ -192,7 +204,12 @@ class _ArchiveContentState extends State<ArchiveContent> {
                   children: [
                     Padding(
                       padding: EdgeInsets.only(right: 8),
-                      child: Text("Choose Rarity:",style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface),),
+                      child: Text(
+                        "Choose Rarity:",
+                        style: TextStyle(
+                            color:
+                                Theme.of(context).colorScheme.inverseSurface),
+                      ),
                     ),
                     ...List.generate(6, (rarity) {
                       return GestureDetector(
@@ -249,7 +266,8 @@ class _ArchiveContentState extends State<ArchiveContent> {
                 const SizedBox(height: 10),
                 Expanded(
                   child: GridView.builder(
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 4,
                       crossAxisSpacing: 3,
                       mainAxisSpacing: 3,
@@ -261,11 +279,16 @@ class _ArchiveContentState extends State<ArchiveContent> {
                     addAutomaticKeepAlives: false,
                     addRepaintBoundaries: true,
                     itemBuilder: (context, index) {
+                      // Access the operator from the filtered list
                       final operator = _filteredOperators[index];
+                      final operatorValue =
+                          operator['value'] as Map<String, dynamic>;
                       return RepaintBoundary(
                         child: OperatorTile(
-                          operator,
-                          key: ValueKey('operator_${operator['name']}'),
+                          operatorValue,
+                          operator[
+                              'key'], // Correctly access the key from the map
+                          key: ValueKey('operator_${operatorValue['name']}'),
                         ),
                       );
                     },

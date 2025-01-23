@@ -158,7 +158,6 @@ class _RecruitSimState extends State<RecruitSim> {
         .where(
             (combination) => _recruitsData!.containsKey(combination.join(',')))
         .map((e) => e.join(','));
-    ;
     final List<String> sortedKeyList = keyList.toList()
       ..sort((a, b) {
         final guaranteesA = (_recruitsData![a]["guarantees"] as List).isEmpty
@@ -389,6 +388,7 @@ class _RecruitSimState extends State<RecruitSim> {
                                   return RepaintBoundary(
                                     child: OperatorTile(
                                       operatorsData[recruitIds[gridIndex]],
+                                      recruitIds[gridIndex],
                                       key: ValueKey('operator_$operatorName'),
                                     ),
                                   );

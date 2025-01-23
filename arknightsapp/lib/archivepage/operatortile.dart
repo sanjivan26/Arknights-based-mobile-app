@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import './operatordetails.dart';
-import './imagemapping.dart';
 
 class OperatorTile extends StatefulWidget {
   final dynamic operator;
+  final String opKey;
 
-  const OperatorTile(this.operator, {super.key});
+  const OperatorTile(this.operator, this.opKey, {super.key});
 
   @override
   State<OperatorTile> createState() => _OperatorTileState();
@@ -16,8 +16,7 @@ class _OperatorTileState extends State<OperatorTile> {
   Widget build(BuildContext context) {
     final operator = widget.operator;
 
-    String imagePath = imageMapping[operator['name']] ?? imageMapping['default']!;
-
+    String imagePath = 'assets/avatars/${widget.opKey}.png';
     double screenWidth = MediaQuery.of(context).size.width;
     double imageSize = screenWidth * 0.20;
 
@@ -26,7 +25,7 @@ class _OperatorTileState extends State<OperatorTile> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => OperatorDetails(operator: operator),
+            builder: (_) => OperatorDetails(operator: operator, opKey: widget.opKey,),
           ),
         );
       },
@@ -54,7 +53,7 @@ class _OperatorTileState extends State<OperatorTile> {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(15),
                   child: Image.asset(
-                    imagePath,  
+                    imagePath,
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -62,7 +61,8 @@ class _OperatorTileState extends State<OperatorTile> {
               Flexible(
                 child: Text(
                   operator['name'] ?? 'Unknown Operator',
-                  style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface),
+                  style: TextStyle(
+                      color: Theme.of(context).colorScheme.inverseSurface),
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
                 ),

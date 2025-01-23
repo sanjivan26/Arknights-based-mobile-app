@@ -6,8 +6,9 @@ import './talent.dart';
 
 class OperatorDetails extends StatelessWidget {
   final dynamic operator;
+  final String opKey;
 
-  const OperatorDetails({super.key, required this.operator});
+  const OperatorDetails({super.key, required this.operator, required this.opKey});
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +39,7 @@ class OperatorDetails extends StatelessWidget {
             itemBuilder: (context, index) {
               switch (index) {
                 case 0:
-                  return OperatorInfo(operator: operator);
+                  return OperatorInfo(operator: operator, opKey: opKey,);
                 case 1:
                   return Trait(operator: operator);
                 case 2:

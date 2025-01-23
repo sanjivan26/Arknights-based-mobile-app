@@ -13,7 +13,6 @@ class Skills extends StatefulWidget {
 
 class _SkillsState extends State<Skills> {
   int skillLevel = 0;
-  RangeValues _currentRange = const RangeValues(0,9);
   late Future<Map<String, dynamic>> _skillsFuture;
   String skillName = "";
   String skillDescription = "";
@@ -26,7 +25,7 @@ class _SkillsState extends State<Skills> {
 
     final operatorSkills = widget.operator['skills'] ?? [];
     if (operatorSkills.isNotEmpty) {
-      final defaultSkillId = operatorSkills[skillLevel+1]['skillId'];
+      final defaultSkillId = operatorSkills[skillLevel + 1]['skillId'];
       _loadSkillData(defaultSkillId);
     } else {
       skillName = "This character doesn't have skills.";
@@ -39,10 +38,10 @@ class _SkillsState extends State<Skills> {
       final skillData = skills[skillId];
       if (skillData != null) {
         setState(() {
-          skillName = skillData['levels'][skillLevel+1]['name'] ?? '';
+          skillName = skillData['levels'][skillLevel + 1]['name'] ?? '';
           skillDescription = replaceDescription(
-            skillData['levels'][skillLevel+1]['description'] ?? '',
-            skillData['levels'][skillLevel+1]['blackboard'] ?? [],
+            skillData['levels'][skillLevel + 1]['description'] ?? '',
+            skillData['levels'][skillLevel + 1]['blackboard'] ?? [],
           );
         });
       }
@@ -147,13 +146,13 @@ class _SkillsState extends State<Skills> {
                                   if (skillData != null) {
                                     setState(() {
                                       skillName = skillData['levels']
-                                              [skillLevel+1]['name'] ??
+                                              [skillLevel + 1]['name'] ??
                                           '';
                                       skillDescription = replaceDescription(
-                                        skillData['levels'][skillLevel+1]
+                                        skillData['levels'][skillLevel + 1]
                                                 ['description'] ??
                                             '',
-                                        skillData['levels'][skillLevel+1]
+                                        skillData['levels'][skillLevel + 1]
                                                 ['blackboard'] ??
                                             [],
                                       );
@@ -185,13 +184,13 @@ class _SkillsState extends State<Skills> {
                                   if (skillData != null) {
                                     setState(() {
                                       skillName = skillData['levels']
-                                              [skillLevel+1]['name'] ??
+                                              [skillLevel + 1]['name'] ??
                                           '';
                                       skillDescription = replaceDescription(
-                                        skillData['levels'][skillLevel+1]
+                                        skillData['levels'][skillLevel + 1]
                                                 ['description'] ??
                                             '',
-                                        skillData['levels'][skillLevel+1]
+                                        skillData['levels'][skillLevel + 1]
                                                 ['blackboard'] ??
                                             [],
                                       );
@@ -223,13 +222,13 @@ class _SkillsState extends State<Skills> {
                                   if (skillData != null) {
                                     setState(() {
                                       skillName = skillData['levels']
-                                              [skillLevel+1]['name'] ??
+                                              [skillLevel + 1]['name'] ??
                                           '';
                                       skillDescription = replaceDescription(
-                                        skillData['levels'][skillLevel+1]
+                                        skillData['levels'][skillLevel + 1]
                                                 ['description'] ??
                                             '',
-                                        skillData['levels'][skillLevel+1]
+                                        skillData['levels'][skillLevel + 1]
                                                 ['blackboard'] ??
                                             [],
                                       );
@@ -287,23 +286,22 @@ class _SkillsState extends State<Skills> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          'Range: ${_currentRange.start.toStringAsFixed(1)} - ${_currentRange.end.toStringAsFixed(1)}',
-                          style: const TextStyle(fontSize: 20),
+                          'Skill Level: ${skillLevel + 1}',
+                          style: const TextStyle(fontSize: 16),
                         ),
-                        RangeSlider(
-                          values: _currentRange,
-                          min: 0,
-                          max: 100,
+                        Slider(
+                          value: (skillLevel + 1).toDouble(),
+                          min: 1,
+                          max: 10,
                           divisions: 10,
-                          labels: RangeLabels(
-                            _currentRange.start.toStringAsFixed(1),
-                            _currentRange.end.toStringAsFixed(1),
-                          ),
+                          label: (skillLevel + 1).toString(),
                           activeColor: Colors.blue,
                           inactiveColor: Colors.grey.shade300,
-                          onChanged: (RangeValues values) {
+                          onChanged: (value) {
                             setState(() {
-                              _currentRange = values;
+                              skillLevel = value.toInt() - 1;
+                              _loadSkillData(
+                                  operatorSkills[selected - 1]['skillId']);
                             });
                           },
                         ),
