@@ -13,6 +13,8 @@ class OperatorDetails extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
+
     return Theme(
       data: Theme.of(context).copyWith(
         dividerTheme: DividerThemeData(
@@ -26,33 +28,27 @@ class OperatorDetails extends StatelessWidget {
         appBar: AppBar(
           title: Text(
             operator['name'] ?? 'Operator Details',
-            style:
-                TextStyle(color: Theme.of(context).colorScheme.inverseSurface),
+            style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface),
           ),
           backgroundColor: Theme.of(context).colorScheme.surface,
         ),
         body: Container(
           color: Theme.of(context).colorScheme.surface,
-          child: ListView.separated(
-            separatorBuilder: (context, index) => Divider(),
-            itemCount: 4,
-            itemBuilder: (context, index) {
-              switch (index) {
-                case 0:
-                  return OperatorInfo(operator: operator, opKey: opKey,);
-                case 1:
-                  return Trait(operator: operator);
-                case 2:
-                  return Skills(operator: operator, screenHeight: screenHeight,);
-                case 3:
-                  return Talent(operator: operator);
-                default:
-                  return SizedBox.shrink();
-              }
-            },
+          child: ListView(
+            children: [
+              OperatorInfo(operator: operator, opKey: opKey),
+              Divider(),
+              Trait(operator: operator),
+              Divider(),
+              Skills(operator: operator, screenHeight: screenHeight, screenWidth: screenWidth),
+              Divider(),
+              Talent(operator: operator),
+              Divider(),
+            ],
           ),
         ),
       ),
     );
   }
 }
+

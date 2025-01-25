@@ -316,7 +316,7 @@ class _RecruitSimState extends State<RecruitSim> {
                           Row(
                             children: [
                               const SizedBox(width: 5),
-                              if(confirmedRarity!=0)
+                              if (confirmedRarity != 0)
                                 Container(
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 5, vertical: 1),
@@ -369,27 +369,62 @@ class _RecruitSimState extends State<RecruitSim> {
                                 return Text('Error loading operators');
                               }
                               final operatorsData = snapshot.data!;
-                              return GridView.builder(
+                              return ListView.builder(
                                 shrinkWrap: true,
                                 physics: const NeverScrollableScrollPhysics(),
-                                gridDelegate:
-                                    const SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 4,
-                                  crossAxisSpacing: 3,
-                                  mainAxisSpacing: 3,
-                                  childAspectRatio: 0.825,
-                                ),
-                                itemCount: recruitIds.length,
-                                itemBuilder: (context, gridIndex) {
-                                  final operatorName =
-                                      operatorsData[recruitIds[gridIndex]]
-                                              ?["name"] ??
-                                          'Name Unknown';
-                                  return RepaintBoundary(
-                                    child: OperatorTile(
-                                      operatorsData[recruitIds[gridIndex]],
-                                      recruitIds[gridIndex],
-                                      key: ValueKey('operator_$operatorName'),
+                                itemCount: (recruitIds.length / 4)
+                                    .ceil(), 
+                                itemBuilder: (context, rowIndex) {
+                                  final startIndex = rowIndex * 4;
+                                  final endIndex = math.min(
+                                      startIndex + 4, recruitIds.length);
+                                  final rowItemCount = endIndex - startIndex;
+
+                                  return Padding(
+                                    padding:
+                                        const EdgeInsets.symmetric(vertical: 3),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: List.generate(
+                                        4,
+                                        (columnIndex) {
+                                          if (columnIndex < rowItemCount) {
+                                            final index =
+                                                startIndex + columnIndex;
+                                            final operatorId = recruitIds[index];
+                                            final operator =
+                                                operatorsData[operatorId];
+
+                                            return Expanded(
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 3),
+                                                child: OperatorTile(
+                                                  operator, 
+                                                  operatorId,
+                                                  key: ValueKey(operatorId),
+                                                ),
+                                              ),
+                                            );
+                                          } else {
+                                            return Expanded(
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 3),
+                                                child: Container(
+                                                  height:
+                                                      100, // Set a fixed height for the placeholder
+                                                  color: Colors
+                                                      .transparent, // Make it invisible
+                                                ),
+                                              ),
+                                            );
+                                          }
+                                        },
+                                      ),
                                     ),
                                   );
                                 },

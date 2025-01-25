@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import './operatortile.dart';
@@ -81,11 +82,19 @@ class _ArchiveContentState extends State<ArchiveContent> {
   Future<void> _initializeOperators(Map<String, dynamic> data) async {
     _allOperators = data.entries
         .where((entry) => entry.key.startsWith('char'))
-        .map((entry) => {
-              'key': entry.key,
-              'value': entry.value,
-            })
-        .toList();
+        .map((entry) {
+      final value = entry.value as Map<String, dynamic>;
+      return {
+        'key': entry.key,
+        'value': {
+          'name': value['name'] ?? 'Unknown',
+          'description': value['description'] ?? '',
+          'rarity': value['rarity'] ?? 0,
+          'profession': value['profession'] ?? 'Unknown',
+          'skills': value['skills'] ?? [],
+        },
+      };
+    }).toList();
 
     _allOperators.sort((a, b) =>
         (a['value']['name'] as String).compareTo(b['value']['name'] as String));
@@ -133,6 +142,14 @@ class _ArchiveContentState extends State<ArchiveContent> {
     });
   }
 
+  void debounce(void Function() action,
+      {Duration delay = const Duration(milliseconds: 300)}) {
+    if (_debounceTimer?.isActive ?? false) {
+      _debounceTimer!.cancel();
+    }
+    _debounceTimer = Timer(delay, action);
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<Map<String, dynamic>>(
@@ -155,14 +172,12 @@ class _ArchiveContentState extends State<ArchiveContent> {
                     prefixIcon: Icon(Icons.search),
                   ),
                   onChanged: (value) {
-                    if (_debounceTimer?.isActive ?? false) {
-                      _debounceTimer!.cancel();
-                    }
-                    _debounceTimer =
-                        Timer(const Duration(milliseconds: 300), () {
+                    debounce(() {
                       if (mounted) {
-                        _searchText = value;
-                        filterOperators();
+                        setState(() {
+                          _searchText = value;
+                          filterOperators();
+                        });
                       }
                     });
                   },
@@ -265,35 +280,64 @@ class _ArchiveContentState extends State<ArchiveContent> {
                 ),
                 const SizedBox(height: 10),
                 Expanded(
-                  child: GridView.builder(
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 4,
-                      crossAxisSpacing: 3,
-                      mainAxisSpacing: 3,
-                      childAspectRatio: 0.825,
-                    ),
-                    padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                    itemCount: _filteredOperators.length,
-                    cacheExtent: 500,
-                    addAutomaticKeepAlives: false,
-                    addRepaintBoundaries: true,
-                    itemBuilder: (context, index) {
-                      // Access the operator from the filtered list
-                      final operator = _filteredOperators[index];
-                      final operatorValue =
-                          operator['value'] as Map<String, dynamic>;
-                      return RepaintBoundary(
-                        child: OperatorTile(
-                          operatorValue,
-                          operator[
-                              'key'], // Correctly access the key from the map
-                          key: ValueKey('operator_${operatorValue['name']}'),
+                  child: _filteredOperators.isNotEmpty
+                      ? ListView.builder(
+                          itemCount: (_filteredOperators.length / 4).ceil(),
+                          itemBuilder: (context, rowIndex) {
+                            final startIndex = rowIndex * 4;
+                            final endIndex =
+                                min(startIndex + 4, _filteredOperators.length);
+                            final rowItemCount = endIndex - startIndex;
+
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 3),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: List.generate(4, 
+                                  (columnIndex) {
+                                    if (columnIndex < rowItemCount) {
+                                      final index = startIndex + columnIndex;
+                                      final operator =
+                                          _filteredOperators[index];
+                                      final operatorValue = operator['value']
+                                          as Map<String, dynamic>;
+
+                                      return Expanded(
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 3),
+                                          child: OperatorTile(
+                                            operatorValue,
+                                            operator['key'],
+                                            key: ValueKey(operator['key']),
+                                          ),
+                                        ),
+                                      );
+                                    } else {
+                                      return Expanded(
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 3),
+                                          child: Container(
+                                            height:
+                                                100, 
+                                            color: Colors
+                                                .transparent, 
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                  },
+                                ),
+                              ),
+                            );
+                          },
+                        )
+                      : const Center(
+                          child: Text('No operators match your filters'),
                         ),
-                      );
-                    },
-                  ),
-                ),
+                )
               ],
             ),
           );
