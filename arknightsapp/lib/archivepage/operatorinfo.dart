@@ -103,41 +103,44 @@ class _OperatorInfoState extends State<OperatorInfo> {
                     ),
                   ),
                   const SizedBox(width: 25),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        widget.operator['name'] ?? 'Unknown Operator',
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.inverseSurface,
-                          fontSize: 18,
-                        ),
-                        softWrap: true,
-                        overflow: TextOverflow.visible,
-                      ),
-                      Row(
-                        children: List.generate(
-                          rarity,
-                          (index) => Icon(
-                            Icons.star,
-                            size: 22,
+                  Flexible(
+                    flex: 1,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          widget.operator['name'] ?? 'Unknown Operator',
+                          style: TextStyle(
                             color: Theme.of(context).colorScheme.inverseSurface,
+                            fontSize: 18,
+                          ),
+                          softWrap: true,
+                          overflow: TextOverflow.visible,
+                        ),
+                        Row(
+                          children: List.generate(
+                            rarity,
+                            (index) => Icon(
+                              Icons.star,
+                              size: 22,
+                              color: Theme.of(context).colorScheme.inverseSurface,
+                            ),
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 3),
-                      Text(
-                        classMapping[widget.operator['profession']] ?? '',
-                        style: TextStyle(
-                            fontSize: 15, color: Theme.of(context).colorScheme.onSurface),
-                      ),
-                      Text(
-                        factionName,
-                        style: TextStyle(
-                            fontSize: 15, color: Theme.of(context).colorScheme.onSurface),
-                      ),
-                    ],
+                        const SizedBox(height: 3),
+                        Text(
+                          classMapping[widget.operator['profession']] ?? '',
+                          style: TextStyle(
+                              fontSize: 15, color: Theme.of(context).colorScheme.onSurface),
+                        ),
+                        Text(
+                          factionName,
+                          style: TextStyle(
+                              fontSize: 15, color: Theme.of(context).colorScheme.onSurface),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),

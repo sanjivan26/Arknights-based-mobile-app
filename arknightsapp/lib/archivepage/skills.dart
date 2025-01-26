@@ -1,3 +1,4 @@
+import 'package:arknightsapp/theme/recoverytypecode.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -21,7 +22,11 @@ class _SkillsState extends State<Skills> {
   int skillLevel = 0;
   late Future<Map<String, dynamic>> _skillsFuture;
   String skillName = "";
+  String recoverytype = "";
+  String activationType = "";
   String skillDescription = "";
+  int spCost = 0;
+  int initSp = 0;
   int selected = 1;
   int maxSkillLevel = 1;
 
@@ -52,6 +57,11 @@ class _SkillsState extends State<Skills> {
             skillData['levels'][skillLevel]['description'] ?? '',
             skillData['levels'][skillLevel]['blackboard'] ?? [],
           );
+          recoverytype =
+              skillData['levels'][skillLevel]['spData']['spType'].toString();
+          activationType = skillData['levels'][skillLevel]['skillType'];
+          initSp = skillData['levels'][skillLevel]['spData']['initSp'];
+          spCost = skillData['levels'][skillLevel]['spData']['spCost'];
         });
       }
     });
@@ -75,16 +85,46 @@ class _SkillsState extends State<Skills> {
     };
     keyValueMap.forEach((key, value) {
       var uppr = key.toUpperCase();
+      String toReplace = value.toString();
+      if (value == value.toInt()) {
+        toReplace = value.toInt().toString();
+      }
       description = description
-          .replaceAll('{$key:0%}', value.toString())
-          .replaceAll('{$key}', value.toString())
-          .replaceAll('{$uppr}', value.toString());
+          .replaceAll('{$key:0%}', '${(value * 100).toInt()}%')
+          .replaceAll('{$key}', toReplace)
+          .replaceAll('{$uppr}', toReplace);
     });
     return description
         .replaceAll(RegExp(r'<\/?>'), '')
         .replaceAll(RegExp(r'<@ba\..{2,7}>'), '')
         .replaceAll(RegExp(r'<\$ba\.dt\.element>'), '')
         .replaceAll(RegExp(r'<\$ba\.[a-zA-Z_]*>'), '');
+  }
+
+  String recoveryName(String inputString) {
+    if (inputString == "INCREASE_WITH_TIME") {
+      return "Auto Recovery";
+    }
+    if (inputString == "INCREASE_WHEN_ATTACK") {
+      return "Offensive Recovery";
+    }
+    if (inputString == "INCREASE_WHEN_TAKEN_DAMAGE") {
+      return "Defensive Recovery";
+    }
+    return inputString;
+  }
+
+  String activationName(String inputString) {
+    if (inputString == "MANUAL") {
+      return "Manual";
+    }
+    if (inputString == "AUTO") {
+      return "Auto";
+    }
+    if (inputString == "PASSIVE") {
+      return "Passive";
+    }
+    return inputString;
   }
 
   @override
@@ -187,6 +227,20 @@ class _SkillsState extends State<Skills> {
                                                         [],
                                                   );
                                                   selected = 1;
+                                                  recoverytype =
+                                                      skillData['levels']
+                                                              [skillLevel]
+                                                          ['spData']['spType'].toString();
+                                                  activationType =
+                                                      skillData['levels']
+                                                              [skillLevel]
+                                                          ['skillType'];
+                                                  initSp = skillData['levels']
+                                                          [skillLevel]['spData']
+                                                      ['initSp'];
+                                                  spCost = skillData['levels']
+                                                          [skillLevel]['spData']
+                                                      ['spCost'];
                                                 });
                                               }
                                             }
@@ -237,6 +291,20 @@ class _SkillsState extends State<Skills> {
                                                         [],
                                                   );
                                                   selected = 2;
+                                                  recoverytype =
+                                                      skillData['levels']
+                                                              [skillLevel]
+                                                          ['spData']['spType'].toString();
+                                                  activationType =
+                                                      skillData['levels']
+                                                              [skillLevel]
+                                                          ['skillType'];
+                                                  initSp = skillData['levels']
+                                                          [skillLevel]['spData']
+                                                      ['initSp'];
+                                                  spCost = skillData['levels']
+                                                          [skillLevel]['spData']
+                                                      ['spCost'];
                                                 });
                                               }
                                             }
@@ -287,6 +355,20 @@ class _SkillsState extends State<Skills> {
                                                         [],
                                                   );
                                                   selected = 3;
+                                                  recoverytype =
+                                                      skillData['levels']
+                                                              [skillLevel]
+                                                          ['spData']['spType'].toString();
+                                                  activationType =
+                                                      skillData['levels']
+                                                              [skillLevel]
+                                                          ['skillType'];
+                                                  initSp = skillData['levels']
+                                                          [skillLevel]['spData']
+                                                      ['initSp'];
+                                                  spCost = skillData['levels']
+                                                          [skillLevel]['spData']
+                                                      ['spCost'];
                                                 });
                                               }
                                             }
@@ -300,12 +382,13 @@ class _SkillsState extends State<Skills> {
                                 ],
                               ),
                             ),
-                            Text(
-                              "S${skillLevel > 6 ? 7 : skillLevel + 1}M${skillLevel > 6 ? skillLevel % 6 : 0}",
-                              style: const TextStyle(
-                                fontSize: 16,
+                            if (rarity > 2)
+                              Text(
+                                "S${skillLevel > 6 ? 7 : skillLevel + 1}M${skillLevel > 6 ? skillLevel % 6 : 0}",
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                ),
                               ),
-                            ),
                           ],
                         ),
                         SizedBox(width: 25),
@@ -316,71 +399,232 @@ class _SkillsState extends State<Skills> {
                               Expanded(
                                 child: SingleChildScrollView(
                                   child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
                                     children: [
-                                      Text(
-                                        skillName,
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onSurface,
+                                      Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Text(
+                                          skillName,
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurface,
+                                          ),
                                         ),
                                       ),
-                                      Text(
-                                        skillDescription.isNotEmpty
-                                            ? skillDescription
-                                            : "No skill description available.",
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onSurface,
+                                      if (rarity > 2)
+                                        Wrap(
+                                          direction: Axis.horizontal,
+                                          spacing: 3,
+                                          children: [
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                if (activationType != 'PASSIVE')
+                                                  Row(
+                                                    children: [
+                                                      Container(
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color:
+                                                              Theme.of(context)
+                                                                  .colorScheme
+                                                                  .surfaceTint,
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(5),
+                                                        ),
+                                                        child: Row(
+                                                          children: [
+                                                            Icon(
+                                                              Icons.play_arrow,
+                                                              size: 18,
+                                                              color: Theme.of(
+                                                                      context)
+                                                                  .colorScheme
+                                                                  .onSurface,
+                                                            ),
+                                                            Text(
+                                                              '$initSp sp ',
+                                                              style: TextStyle(
+                                                                fontSize: 14,
+                                                                color: Theme.of(
+                                                                        context)
+                                                                    .colorScheme
+                                                                    .onSurface,
+                                                              ),
+                                                              softWrap: true,
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                      SizedBox(
+                                                        width: 3,
+                                                      ),
+                                                      Container(
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color:
+                                                              Theme.of(context)
+                                                                  .colorScheme
+                                                                  .surfaceTint,
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(5),
+                                                        ),
+                                                        child: Row(
+                                                          children: [
+                                                            Icon(
+                                                              Icons.bolt,
+                                                              size: 18,
+                                                              color: const Color
+                                                                  .fromARGB(255,
+                                                                  92, 255, 74),
+                                                            ),
+                                                            Text(
+                                                              '$spCost sp ',
+                                                              style: TextStyle(
+                                                                fontSize: 14,
+                                                                color: Theme.of(
+                                                                        context)
+                                                                    .colorScheme
+                                                                    .onSurface,
+                                                              ),
+                                                              softWrap: true,
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                SizedBox(height: 3),
+                                                Wrap(
+                                                  alignment:
+                                                      WrapAlignment.start,
+                                                  direction: Axis.horizontal,
+                                                  children: [
+                                                    if (activationType !=
+                                                        'PASSIVE')
+                                                      Container(
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color: recoveryCode(
+                                                              recoverytype),
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(5),
+                                                        ),
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                                  horizontal:
+                                                                      3),
+                                                          child: Text(
+                                                            recoveryName(
+                                                                recoverytype),
+                                                            style: TextStyle(
+                                                              fontSize: 14,
+                                                              color: Color(
+                                                                  0xFFF2F3F4),
+                                                            ),
+                                                            softWrap: true,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    SizedBox(width: 3),
+                                                    Container(
+                                                      decoration: BoxDecoration(
+                                                        color: Theme.of(context)
+                                                            .colorScheme
+                                                            .surfaceTint,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(5),
+                                                      ),
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .symmetric(
+                                                                horizontal: 3),
+                                                        child: Text(
+                                                          activationName(
+                                                              activationType),
+                                                          style: TextStyle(
+                                                            fontSize: 14,
+                                                            color: Color(
+                                                                0xFFF2F3F4),
+                                                          ),
+                                                          softWrap: true,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          ],
                                         ),
-                                        softWrap: true,
+                                      Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Text(
+                                          skillDescription.isNotEmpty
+                                              ? skillDescription
+                                              : "No skill description available.",
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurface,
+                                          ),
+                                          softWrap: true,
+                                        ),
                                       ),
                                     ],
                                   ),
                                 ),
                               ),
-                              SizedBox(
-                                height: 30,
-                                child: SliderTheme(
-                                  data: SliderThemeData(
-                                    activeTrackColor:
-                                        Theme.of(context).colorScheme.onSurface,
-                                    inactiveTrackColor:
-                                        Theme.of(context).colorScheme.surfaceTint,
-                                    thumbColor: Theme.of(context)
-                                        .colorScheme
-                                        .inverseSurface,
-                                  ),
-                                  child: Slider(
-                                    label: "Level",
-                                    value: skillLevel.toDouble(),
-                                    onChanged: (value) {
-                                      setState(() {
-                                        skillLevel = value.toInt();
-                                        if (skillLevel >= maxSkillLevel) {
-                                          skillLevel = maxSkillLevel - 1;
+                              if (rarity > 2)
+                                SizedBox(
+                                  height: 30,
+                                  child: SliderTheme(
+                                    data: SliderThemeData(
+                                      activeTrackColor: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface,
+                                      inactiveTrackColor: Theme.of(context)
+                                          .colorScheme
+                                          .surfaceTint,
+                                      thumbColor: Theme.of(context)
+                                          .colorScheme
+                                          .inverseSurface,
+                                    ),
+                                    child: Slider(
+                                      label: "Level",
+                                      value: skillLevel.toDouble(),
+                                      onChanged: (value) {
+                                        setState(() {
+                                          skillLevel = value.toInt();
+                                          if (skillLevel >= maxSkillLevel) {
+                                            skillLevel = maxSkillLevel - 1;
+                                          }
+                                        });
+                                        final operatorSkills =
+                                            widget.operator['skills'] ?? [];
+                                        if (operatorSkills.isNotEmpty) {
+                                          final skillId =
+                                              operatorSkills[selected - 1]
+                                                  ['skillId'];
+                                          _loadSkillData(skillId);
                                         }
-                                      });
-                                      final operatorSkills =
-                                          widget.operator['skills'] ?? [];
-                                      if (operatorSkills.isNotEmpty) {
-                                        final skillId =
-                                            operatorSkills[selected - 1]
-                                                ['skillId'];
-                                        _loadSkillData(skillId);
-                                      }
-                                    },
-                                    min: 0,
-                                    max: (maxSkillLevel - 1).toDouble(),
+                                      },
+                                      min: 0,
+                                      max: (maxSkillLevel - 1).toDouble(),
+                                    ),
                                   ),
                                 ),
-                              ),
                             ],
                           ),
                         ),

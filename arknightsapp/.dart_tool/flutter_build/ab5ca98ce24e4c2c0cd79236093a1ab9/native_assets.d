@@ -1,0 +1,1 @@
+ C:\\VS\ Code\\AppDev\\arknightsapp\\.dart_tool\\flutter_build\\ab5ca98ce24e4c2c0cd79236093a1ab9\\native_assets.yaml: 
