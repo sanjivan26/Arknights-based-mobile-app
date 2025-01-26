@@ -113,8 +113,8 @@ class _OperatorInfoState extends State<OperatorInfo> {
                           color: Theme.of(context).colorScheme.inverseSurface,
                           fontSize: 18,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                        softWrap: true,
+                        overflow: TextOverflow.visible,
                       ),
                       Row(
                         children: List.generate(

@@ -416,9 +416,9 @@ class _RecruitSimState extends State<RecruitSim> {
                                                         horizontal: 3),
                                                 child: Container(
                                                   height:
-                                                      100, // Set a fixed height for the placeholder
+                                                      100,
                                                   color: Colors
-                                                      .transparent, // Make it invisible
+                                                      .transparent, 
                                                 ),
                                               ),
                                             );

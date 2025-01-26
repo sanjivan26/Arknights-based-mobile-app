@@ -83,6 +83,7 @@ class _SkillsState extends State<Skills> {
     return description
         .replaceAll(RegExp(r'<\/?>'), '')
         .replaceAll(RegExp(r'<@ba\..{2,7}>'), '')
+        .replaceAll(RegExp(r'<\$ba\.dt\.element>'), '')
         .replaceAll(RegExp(r'<\$ba\.[a-zA-Z_]*>'), '');
   }
 
@@ -121,7 +122,7 @@ class _SkillsState extends State<Skills> {
               ),
               padding: const EdgeInsets.all(20),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   Expanded(
                     child: Row(
@@ -144,7 +145,7 @@ class _SkillsState extends State<Skills> {
                             Expanded(
                               child: Column(
                                 mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly, 
+                                    MainAxisAlignment.spaceEvenly,
                                 children: [
                                   if (rarity > 2)
                                     SizedBox(
@@ -169,7 +170,8 @@ class _SkillsState extends State<Skills> {
                                                 .toString();
                                             final skillData = skills[skillId];
                                             if (skillData != null) {
-                                              final levels = skillData['levels'];
+                                              final levels =
+                                                  skillData['levels'];
                                               if (skillLevel < maxSkillLevel) {
                                                 setState(() {
                                                   skillName = levels[skillLevel]
@@ -218,7 +220,8 @@ class _SkillsState extends State<Skills> {
                                                 .toString();
                                             final skillData = skills[skillId];
                                             if (skillData != null) {
-                                              final levels = skillData['levels'];
+                                              final levels =
+                                                  skillData['levels'];
                                               if (skillLevel < maxSkillLevel) {
                                                 setState(() {
                                                   skillName = levels[skillLevel]
@@ -267,7 +270,8 @@ class _SkillsState extends State<Skills> {
                                                 .toString();
                                             final skillData = skills[skillId];
                                             if (skillData != null) {
-                                              final levels = skillData['levels'];
+                                              final levels =
+                                                  skillData['levels'];
                                               if (skillLevel < maxSkillLevel) {
                                                 setState(() {
                                                   skillName = levels[skillLevel]
@@ -295,86 +299,94 @@ class _SkillsState extends State<Skills> {
                                     ),
                                 ],
                               ),
-                            )
+                            ),
+                            Text(
+                              "S${skillLevel > 6 ? 7 : skillLevel + 1}M${skillLevel > 6 ? skillLevel % 6 : 0}",
+                              style: const TextStyle(
+                                fontSize: 16,
+                              ),
+                            ),
                           ],
                         ),
                         SizedBox(width: 25),
                         Expanded(
-                          child: SingleChildScrollView(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  skillName,
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurface,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: SingleChildScrollView(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        skillName,
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface,
+                                        ),
+                                      ),
+                                      Text(
+                                        skillDescription.isNotEmpty
+                                            ? skillDescription
+                                            : "No skill description available.",
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface,
+                                        ),
+                                        softWrap: true,
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                Text(
-                                  skillDescription.isNotEmpty
-                                      ? skillDescription
-                                      : "No skill description available.",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Theme.of(context)
+                              ),
+                              SizedBox(
+                                height: 30,
+                                child: SliderTheme(
+                                  data: SliderThemeData(
+                                    activeTrackColor:
+                                        Theme.of(context).colorScheme.onSurface,
+                                    inactiveTrackColor:
+                                        Theme.of(context).colorScheme.surfaceTint,
+                                    thumbColor: Theme.of(context)
                                         .colorScheme
-                                        .onSurface,
+                                        .inverseSurface,
                                   ),
-                                  softWrap: true,
+                                  child: Slider(
+                                    label: "Level",
+                                    value: skillLevel.toDouble(),
+                                    onChanged: (value) {
+                                      setState(() {
+                                        skillLevel = value.toInt();
+                                        if (skillLevel >= maxSkillLevel) {
+                                          skillLevel = maxSkillLevel - 1;
+                                        }
+                                      });
+                                      final operatorSkills =
+                                          widget.operator['skills'] ?? [];
+                                      if (operatorSkills.isNotEmpty) {
+                                        final skillId =
+                                            operatorSkills[selected - 1]
+                                                ['skillId'];
+                                        _loadSkillData(skillId);
+                                      }
+                                    },
+                                    min: 0,
+                                    max: (maxSkillLevel - 1).toDouble(),
+                                  ),
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
                     ),
                   ),
-                  if (rarity > 2)
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          "S${skillLevel > 6 ? 7 : skillLevel + 1}M${skillLevel > 6 ? skillLevel % 6 : 0}",
-                          style: const TextStyle(
-                            fontSize: 16,
-                          ),
-                        ),
-                        Expanded(
-                          child: SliderTheme(
-                            data: SliderThemeData(
-                              activeTrackColor: Theme.of(context).colorScheme.onSurface,
-                              inactiveTrackColor: Theme.of(context).colorScheme.surfaceTint,
-                              thumbColor: Theme.of(context).colorScheme.inverseSurface,
-                            ),
-                            child: Slider(
-                              label: "Level",
-                              value: skillLevel.toDouble(),
-                              onChanged: (value) {
-                                setState(() {
-                                  skillLevel = value.toInt();
-                                  if (skillLevel >= maxSkillLevel) {
-                                    skillLevel = maxSkillLevel - 1;
-                                  }
-                                });
-                                final operatorSkills =
-                                    widget.operator['skills'] ?? [];
-                                if (operatorSkills.isNotEmpty) {
-                                  final skillId =
-                                      operatorSkills[selected - 1]['skillId'];
-                                  _loadSkillData(skillId);
-                                }
-                              },
-                              min: 0,
-                              max: (maxSkillLevel - 1).toDouble(),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
                 ],
               ),
             ),

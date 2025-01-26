@@ -92,6 +92,10 @@ class _ArchiveContentState extends State<ArchiveContent> {
           'rarity': value['rarity'] ?? 0,
           'profession': value['profession'] ?? 'Unknown',
           'skills': value['skills'] ?? [],
+          'talents': value['talents'] ?? [],
+          'nationId': value['nationId'] ?? [],
+          'groupId': value['groupId'] ?? [],
+          'teamId': value['teamId'] ?? [],
         },
       };
     }).toList();
@@ -131,7 +135,9 @@ class _ArchiveContentState extends State<ArchiveContent> {
         }
 
         if (_selectedRarities.isNotEmpty) {
-          final rarity = operatorValue['rarity'] as int? ?? 0;
+          final rarityString = operatorValue['rarity'] as String? ?? 'TIER_0';
+          final rarity = int.tryParse(rarityString.split('_').last) ?? 0;
+
           if (!_selectedRarities.contains(rarity)) {
             return false;
           }
@@ -294,7 +300,8 @@ class _ArchiveContentState extends State<ArchiveContent> {
                               child: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
-                                children: List.generate(4, 
+                                children: List.generate(
+                                  4,
                                   (columnIndex) {
                                     if (columnIndex < rowItemCount) {
                                       final index = startIndex + columnIndex;
@@ -320,10 +327,8 @@ class _ArchiveContentState extends State<ArchiveContent> {
                                           padding: const EdgeInsets.symmetric(
                                               horizontal: 3),
                                           child: Container(
-                                            height:
-                                                100, 
-                                            color: Colors
-                                                .transparent, 
+                                            height: 100,
+                                            color: Colors.transparent,
                                           ),
                                         ),
                                       );

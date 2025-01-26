@@ -6,7 +6,11 @@ class Trait extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String description = operator['description']
+    String description = (operator['description'])
+        .replaceAll(RegExp(r'<\/?>'), '')
+        .replaceAll(RegExp(r'<@ba\..{2,7}>'), '')
+        .replaceAll(RegExp(r'<\@ba\.[a-zA-Z_]*>'), '')
+        .replaceAll(RegExp(r'<\@ba\.dt\.element>'), '')
         .replaceAll(RegExp(r'(to\s)?\{[A-Za-z_]+(:0%)?\}[\s]?'), '');
 
     return Padding(
