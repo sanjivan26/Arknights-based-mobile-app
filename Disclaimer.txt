@@ -1,0 +1,5 @@
+Disclaimer:
+This is a fan-made companion app for the mobile game Arknights. I am not affiliated, associated, authorized, endorsed by, or in any way officially connected with Hypergryph, Yostar, or any of their subsidiaries or affiliates.
+All content related to Arknights, including but not limited to game names, logos, characters, and assets, is the property of their respective owners.
+
+This app was created for educational and non-commercial purposes to explore mobile app development using Flutter and to support fellow players.
